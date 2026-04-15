@@ -12,6 +12,15 @@ function formatDate(value: string | null): string {
   }).format(new Date(value));
 }
 
+function previewContent(content: string): string {
+  const trimmed = content.trim();
+  if (!trimmed) {
+    return "(sin texto)";
+  }
+
+  return trimmed.length > 140 ? `${trimmed.slice(0, 140)}...` : trimmed;
+}
+
 function App() {
   const {
     authState,
@@ -21,6 +30,8 @@ function App() {
     signIn,
     signOut,
     retrySync,
+    keepLocalConflictVersion,
+    useRemoteConflictVersion,
     userEmail,
     isConfigured
   } = useMemoubApp();
@@ -37,6 +48,8 @@ function App() {
         return "Sin conexion";
       case "error":
         return "Error";
+      case "conflict":
+        return "Conflicto";
       default:
         return "Listo";
     }
@@ -111,6 +124,37 @@ function App() {
           {syncState.message ? <span>{syncState.message}</span> : null}
         </div>
 
+        {syncState.conflict ? (
+          <section className="conflict-panel">
+            <div className="conflict-copy">
+              <p className="eyebrow">Conflicto detectado</p>
+              <h2>Hay cambios distintos en otro dispositivo.</h2>
+              <p>
+                Elige si quieres conservar lo que escribiste en este dispositivo o recuperar la version remota ya
+                guardada.
+              </p>
+            </div>
+            <div className="conflict-grid">
+              <article className="conflict-card">
+                <p className="conflict-title">Tu version local</p>
+                <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt)}</p>
+                <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content)}</p>
+                <button className="primary-button" onClick={() => void keepLocalConflictVersion()}>
+                  Mantener mi version
+                </button>
+              </article>
+              <article className="conflict-card">
+                <p className="conflict-title">Version remota</p>
+                <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt)}</p>
+                <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content)}</p>
+                <button className="ghost-button" onClick={() => void useRemoteConflictVersion()}>
+                  Usar version remota
+                </button>
+              </article>
+            </div>
+          </section>
+        ) : null}
+
         <label className="editor-label" htmlFor="note-editor">
           Nota sincronizada
         </label>
@@ -120,6 +164,7 @@ function App() {
           value={noteContent}
           onChange={(event) => void setNoteContent(event.target.value)}
           placeholder="Escribe aqui. Tus cambios se guardan solos."
+          disabled={Boolean(syncState.conflict)}
           spellCheck
         />
       </section>

@@ -10,7 +10,8 @@ const DEFAULT_SYNC_STATE: SyncState = {
   status: "idle",
   lastSyncedAt: null,
   hasPendingChanges: false,
-  message: null
+  message: null,
+  conflict: null
 };
 
 type AuthState = "loading" | "anonymous" | "authenticated";
@@ -119,7 +120,8 @@ export function useMemoubApp() {
         status: "error",
         hasPendingChanges: false,
         lastSyncedAt: null,
-        message: error instanceof Error ? error.message : "No se pudo cargar la nota."
+        message: error instanceof Error ? error.message : "No se pudo cargar la nota.",
+        conflict: null
       });
       setNoteContentState(createEmptyNote(user.id).content);
     });
@@ -192,6 +194,10 @@ export function useMemoubApp() {
   }, [user]);
 
   const setNoteContent = async (content: string) => {
+    if (syncStateRef.current.conflict) {
+      return;
+    }
+
     setNoteContentState(content);
     if (!syncEngineRef.current) {
       return;
@@ -215,6 +221,18 @@ export function useMemoubApp() {
     }
   };
 
+  const keepLocalConflictVersion = async () => {
+    if (syncEngineRef.current) {
+      await syncEngineRef.current.resolveConflict("local");
+    }
+  };
+
+  const useRemoteConflictVersion = async () => {
+    if (syncEngineRef.current) {
+      await syncEngineRef.current.resolveConflict("remote");
+    }
+  };
+
   return {
     authState,
     syncState,
@@ -223,6 +241,8 @@ export function useMemoubApp() {
     signIn,
     signOut,
     retrySync,
+    keepLocalConflictVersion,
+    useRemoteConflictVersion,
     userEmail: user?.email ?? "Sin email",
     isConfigured: appConfig.isSupabaseConfigured
   };

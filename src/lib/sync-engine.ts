@@ -1,4 +1,4 @@
-import type { LocalNoteSnapshot, Note, SyncState } from "./types";
+import type { LocalNoteSnapshot, Note, SyncConflict, SyncState } from "./types";
 import { NoteRepository } from "./note-repository";
 
 export function nowIsoString(): string {
@@ -61,7 +61,8 @@ export class SyncEngine {
     status: "idle",
     lastSyncedAt: null,
     hasPendingChanges: false,
-    message: null
+    message: null,
+    conflict: null
   };
 
   constructor(
@@ -94,7 +95,8 @@ export class SyncEngine {
       this.setState({
         status: "offline",
         hasPendingChanges: localSnapshot?.pendingChanges ?? false,
-        message: "Usando la copia local."
+        message: "Usando la copia local.",
+        conflict: null
       });
       return fallback;
     }
@@ -112,10 +114,16 @@ export class SyncEngine {
           status: "saved",
           hasPendingChanges: false,
           lastSyncedAt: syncedNote.updatedAt,
-          message: "Cambios locales sincronizados."
+          message: "Cambios locales sincronizados.",
+          conflict: null
         });
         return syncedNote;
       }
+
+      this.currentNote = localSnapshot.note;
+      this.updateNote(localSnapshot.note);
+      this.raiseConflict(localSnapshot.note, remoteNote, localSnapshot.lastSyncedAt);
+      return localSnapshot.note;
     }
 
     this.currentNote = preferredNote;
@@ -125,7 +133,8 @@ export class SyncEngine {
       status: "saved",
       hasPendingChanges: false,
       lastSyncedAt: remoteNote?.updatedAt ?? localSnapshot?.lastSyncedAt ?? null,
-      message: remoteNote ? "Sincronizado con la nube." : "Preparado para sincronizar."
+      message: remoteNote ? "Sincronizado con la nube." : "Preparado para sincronizar.",
+      conflict: null
     });
     return preferredNote;
   }
@@ -144,7 +153,8 @@ export class SyncEngine {
     this.setState({
       status: isOnline ? "idle" : "offline",
       hasPendingChanges: true,
-      message: isOnline ? "Cambios pendientes de sincronizar." : "Sin conexion. Guardado en local."
+      message: isOnline ? "Cambios pendientes de sincronizar." : "Sin conexion. Guardado en local.",
+      conflict: null
     });
 
     return updatedNote;
@@ -159,14 +169,16 @@ export class SyncEngine {
       this.setState({
         status: "offline",
         hasPendingChanges: true,
-        message: "Sin conexion. Reintentaremos cuando vuelva la red."
+        message: "Sin conexion. Reintentaremos cuando vuelva la red.",
+        conflict: null
       });
       return this.currentNote;
     }
 
     this.setState({
       status: "saving",
-      message: null
+      message: null,
+      conflict: null
     });
 
     try {
@@ -174,6 +186,11 @@ export class SyncEngine {
       const preferredNote = choosePreferredNote(this.currentNote, remoteNote);
       if (!preferredNote) {
         return null;
+      }
+
+      if (this.syncState.hasPendingChanges && remoteNote && preferredNote !== this.currentNote) {
+        this.raiseConflict(this.currentNote, remoteNote, this.syncState.lastSyncedAt);
+        return this.currentNote;
       }
 
       if (preferredNote !== this.currentNote) {
@@ -184,7 +201,8 @@ export class SyncEngine {
           status: "saved",
           hasPendingChanges: false,
           lastSyncedAt: preferredNote.updatedAt,
-          message: "La version remota era mas reciente."
+          message: "La version remota era mas reciente.",
+          conflict: null
         });
         return preferredNote;
       }
@@ -197,7 +215,8 @@ export class SyncEngine {
         status: "saved",
         hasPendingChanges: false,
         lastSyncedAt: syncedNote.updatedAt,
-        message: "Todo sincronizado."
+        message: "Todo sincronizado.",
+        conflict: null
       });
       return syncedNote;
     } catch (error) {
@@ -205,7 +224,8 @@ export class SyncEngine {
       this.setState({
         status: isOfflineLike ? "offline" : "error",
         hasPendingChanges: true,
-        message: error instanceof Error ? error.message : "No se pudo sincronizar."
+        message: error instanceof Error ? error.message : "No se pudo sincronizar.",
+        conflict: null
       });
       return this.currentNote;
     }
@@ -229,7 +249,8 @@ export class SyncEngine {
         status: "saved",
         hasPendingChanges: false,
         lastSyncedAt: remoteNote.updatedAt,
-        message: "Nota remota cargada."
+        message: "Nota remota cargada.",
+        conflict: null
       });
       return remoteNote;
     }
@@ -246,9 +267,65 @@ export class SyncEngine {
       status: "saved",
       hasPendingChanges: false,
       lastSyncedAt: remoteNote.updatedAt,
-      message: "Actualizado desde otra sesion."
+      message: "Actualizado desde otra sesion.",
+      conflict: null
     });
     return remoteNote;
+  }
+
+  async resolveConflict(choice: "local" | "remote"): Promise<Note | null> {
+    const conflict = this.syncState.conflict;
+    if (!conflict) {
+      return this.currentNote;
+    }
+
+    if (choice === "remote") {
+      this.currentNote = conflict.remoteNote;
+      this.updateNote(conflict.remoteNote);
+      await this.repository.saveLocal(buildSnapshot(conflict.remoteNote, false, conflict.remoteNote.updatedAt));
+      this.setState({
+        status: "saved",
+        hasPendingChanges: false,
+        lastSyncedAt: conflict.remoteNote.updatedAt,
+        message: "Se ha mantenido la version remota.",
+        conflict: null
+      });
+      return conflict.remoteNote;
+    }
+
+    this.setState({
+      status: "saving",
+      message: "Guardando tu version local...",
+      conflict
+    });
+
+    const syncedNote = await this.repository.upsertRemote(conflict.localNote);
+    this.currentNote = syncedNote;
+    this.updateNote(syncedNote);
+    await this.repository.saveLocal(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
+    this.setState({
+      status: "saved",
+      hasPendingChanges: false,
+      lastSyncedAt: syncedNote.updatedAt,
+      message: "Se ha mantenido tu version local.",
+      conflict: null
+    });
+    return syncedNote;
+  }
+
+  private raiseConflict(localNote: Note, remoteNote: Note, lastSyncedAt: string | null): void {
+    const conflict: SyncConflict = {
+      localNote,
+      remoteNote
+    };
+
+    this.setState({
+      status: "conflict",
+      hasPendingChanges: true,
+      lastSyncedAt,
+      message: "Hay cambios distintos en otro dispositivo. Elige que version mantener.",
+      conflict
+    });
   }
 
   private setState(partial: Partial<SyncState>): void {

@@ -223,7 +223,8 @@ describe("SyncEngine", () => {
     expect(repository.fetchRemote).toHaveBeenCalledTimes(1);
   });
 
-  it("prefers the newer remote note even when both versions share the same id", async () => {
+  it("raises a conflict when a newer remote note exists while local changes are pending", async () => {
+    let latestState: SyncState | null = null;
     let latestNote: Note | null = null;
     let localNoteId = "shared-id";
 
@@ -246,7 +247,9 @@ describe("SyncEngine", () => {
       (note) => {
         latestNote = note;
       },
-      () => undefined
+      (state) => {
+        latestState = state;
+      }
     );
 
     await engine.bootstrap(false);
@@ -258,7 +261,75 @@ describe("SyncEngine", () => {
     await engine.syncNow(true);
 
     expect(repository.upsertRemote).not.toHaveBeenCalled();
-    expect(latestNote.content).toBe("remote wins");
+    expect(latestNote.content).toBe("local older");
+    expect(latestState).toMatchObject({
+      status: "conflict",
+      hasPendingChanges: true,
+      message: "Hay cambios distintos en otro dispositivo. Elige que version mantener."
+    });
+    expect(latestState?.conflict?.remoteNote.content).toBe("remote wins");
+  });
+
+  it("can keep the local version after a conflict", async () => {
+    let latestNote: Note | null = null;
+    let latestState: SyncState | null = null;
+
+    const repository = {
+      loadLocal: vi.fn(async () => ({
+        userId: "user-1",
+        note: buildNote({
+          id: "shared-id",
+          content: "local older",
+          updatedAt: "2026-04-15T10:00:00.000Z"
+        }),
+        pendingChanges: true,
+        lastSyncedAt: "2026-04-15T10:00:00.000Z"
+      })),
+      saveLocal: vi.fn(async () => undefined),
+      fetchRemote: vi.fn(async () =>
+        buildNote({
+          id: "shared-id",
+          content: "remote wins",
+          updatedAt: "2026-04-15T10:01:00.000Z"
+        })
+      ),
+      upsertRemote: vi.fn(async (note: Note) => ({
+        ...note,
+        updatedAt: "2026-04-15T10:02:00.000Z"
+      }))
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      (note) => {
+        latestNote = note;
+      },
+      (state) => {
+        latestState = state;
+      }
+    );
+
+    await engine.bootstrap(true);
+    await engine.resolveConflict("local");
+
+    expect(repository.upsertRemote).toHaveBeenCalledTimes(1);
+    expect(latestNote).not.toBeNull();
+    if (!latestNote) {
+      throw new Error("Expected a resolved local note.");
+    }
+    expect(latestNote.content).toBe("local older");
+    expect(latestState).toMatchObject({
+      status: "saved",
+      hasPendingChanges: false,
+      message: "Se ha mantenido tu version local."
+    });
+    expect(latestState?.conflict).toBeNull();
+  });
+
+  it("can use the remote version after a conflict", async () => {
+    let latestNote: Note | null = null;
+    let latestState: SyncState | null = null;
 
     const remoteNewerRepository = {
       loadLocal: vi.fn(async () => ({
@@ -288,16 +359,25 @@ describe("SyncEngine", () => {
       (note) => {
         latestNote = note;
       },
-      () => undefined
+      (state) => {
+        latestState = state;
+      }
     );
 
     await engineWithPendingLocal.bootstrap(true);
+    await engineWithPendingLocal.resolveConflict("remote");
 
     expect(remoteNewerRepository.upsertRemote).not.toHaveBeenCalled();
     expect(latestNote).not.toBeNull();
     if (!latestNote) {
-      throw new Error("Expected remote note to win.");
+      throw new Error("Expected remote note to be chosen.");
     }
     expect(latestNote.content).toBe("remote wins");
+    expect(latestState).toMatchObject({
+      status: "saved",
+      hasPendingChanges: false,
+      message: "Se ha mantenido la version remota."
+    });
+    expect(latestState?.conflict).toBeNull();
   });
 });
