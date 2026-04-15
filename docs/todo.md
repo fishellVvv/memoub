@@ -17,6 +17,7 @@
 
 ## Siguiente linea de desarrollo
 
+- Diseñar la interfaz mobile-first partiendo de la spec Android
 - Mejorar UX de estados y mensajes de sincronizacion
 - Refinar la experiencia del panel de conflicto
 - Documentar una rutina simple de release y verificaciones post-deploy
@@ -24,6 +25,7 @@
 ## Pendiente funcional
 
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
+- Adaptar la experiencia de Windows a la base Android-first
 
 ## Temas a pulir
 

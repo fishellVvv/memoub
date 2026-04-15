@@ -18,6 +18,11 @@
 
 El flujo principal ya esta validado en local y en produccion. Lo siguiente es pulir mejor la experiencia de sincronizacion y endurecer algunos casos limite.
 
+## Direccion de producto
+
+La siguiente fase toma **Android como experiencia principal** y usara un enfoque **mobile-first** para el rediseño visual.  
+La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/android-ux.md).
+
 ## Stack
 
 - React + TypeScript + Vite
