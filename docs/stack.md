@@ -24,5 +24,7 @@
 - Auth con Google ya conectado a Supabase
 - Guardado remoto y cache local ya operativos
 - La sincronizacion entre sesiones abiertas ya se actualiza automaticamente
+- La resincronizacion al volver desde offline ya se ha validado
+- Los conflictos entre version local y remota ya se resuelven con eleccion explicita
 - El flujo entre Android y Windows ya se ha probado correctamente
 - El despliegue en Vercel y el acceso en produccion ya se han validado

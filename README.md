@@ -9,12 +9,14 @@
 - Persistencia correcta al recargar la aplicacion
 - Cache local con soporte offline basico
 - Sincronizacion automatica entre sesiones abiertas
+- Resincronizacion tras volver desde offline validada
+- Conflictos offline detectados con eleccion entre version local y remota
 - Flujo validado entre Android y Windows
 - Despliegue en produccion funcionando en Vercel
 
 ## Limitacion actual
 
-El flujo principal ya esta validado en local y en produccion, pero todavia falta validar a fondo el comportamiento offline y pulir algunos estados de sincronizacion.
+El flujo principal ya esta validado en local y en produccion. Lo siguiente es pulir mejor la experiencia de sincronizacion y endurecer algunos casos limite.
 
 ## Stack
 

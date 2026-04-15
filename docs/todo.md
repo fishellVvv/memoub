@@ -12,15 +12,18 @@
 - Flujo Android -> Windows validado
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
+- Resincronizacion offline simple validada
+- Resolucion manual de conflicto local/remoto validada
 
 ## Siguiente linea de desarrollo
 
-- Validar comportamiento offline y resincronizacion de extremo a extremo
 - Mejorar UX de estados y mensajes de sincronizacion
+- Refinar la experiencia del panel de conflicto
+- Documentar una rutina simple de release y verificaciones post-deploy
 
 ## Pendiente funcional
 
-- Documentar una rutina simple de release y verificaciones post-deploy
+- Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 
 ## Temas a pulir
 
