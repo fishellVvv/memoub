@@ -22,6 +22,18 @@ export function choosePreferredNote(localNote: Note | null, remoteNote: Note | n
   return localNote ?? remoteNote;
 }
 
+function hasRemoteChangedSince(lastSyncedAt: string | null, remoteNote: Note | null): boolean {
+  if (!remoteNote) {
+    return false;
+  }
+
+  if (!lastSyncedAt) {
+    return true;
+  }
+
+  return new Date(remoteNote.updatedAt).getTime() > new Date(lastSyncedAt).getTime();
+}
+
 export function createDebouncedTask(task: () => Promise<void>, delayMs: number) {
   let timer: number | null = null;
 
@@ -105,7 +117,7 @@ export class SyncEngine {
     const preferredNote = choosePreferredNote(localSnapshot?.note ?? null, remoteNote) ?? createEmptyNote(this.userId);
 
     if (localSnapshot?.pendingChanges && localSnapshot.note) {
-      if (!remoteNote || preferredNote === localSnapshot.note) {
+      if (!hasRemoteChangedSince(localSnapshot.lastSyncedAt, remoteNote)) {
         const syncedNote = await this.repository.upsertRemote(localSnapshot.note);
         await this.repository.saveLocal(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
         this.currentNote = syncedNote;
@@ -122,7 +134,7 @@ export class SyncEngine {
 
       this.currentNote = localSnapshot.note;
       this.updateNote(localSnapshot.note);
-      this.raiseConflict(localSnapshot.note, remoteNote, localSnapshot.lastSyncedAt);
+      this.raiseConflict(localSnapshot.note, remoteNote!, localSnapshot.lastSyncedAt);
       return localSnapshot.note;
     }
 
@@ -188,8 +200,8 @@ export class SyncEngine {
         return null;
       }
 
-      if (this.syncState.hasPendingChanges && remoteNote && preferredNote !== this.currentNote) {
-        this.raiseConflict(this.currentNote, remoteNote, this.syncState.lastSyncedAt);
+      if (this.syncState.hasPendingChanges && hasRemoteChangedSince(this.syncState.lastSyncedAt, remoteNote)) {
+        this.raiseConflict(this.currentNote, remoteNote!, this.syncState.lastSyncedAt);
         return this.currentNote;
       }
 

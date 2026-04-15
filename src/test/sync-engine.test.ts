@@ -226,16 +226,68 @@ describe("SyncEngine", () => {
   it("raises a conflict when a newer remote note exists while local changes are pending", async () => {
     let latestState: SyncState | null = null;
     let latestNote: Note | null = null;
-    let localNoteId = "shared-id";
+
+    const repository = {
+      loadLocal: vi.fn(async () => ({
+        userId: "user-1",
+        note: buildNote({
+          id: "shared-id",
+          content: "local older",
+          updatedAt: "2026-04-15T10:00:00.000Z"
+        }),
+        pendingChanges: true,
+        lastSyncedAt: "2026-04-15T09:59:00.000Z"
+      })),
+      saveLocal: vi.fn(async () => undefined),
+      fetchRemote: vi.fn(async () =>
+        buildNote({
+          id: "shared-id",
+          content: "remote wins",
+          updatedAt: "2026-04-15T09:59:30.000Z"
+        })
+      ),
+      upsertRemote: vi.fn(async (note: Note) => note)
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      (note) => {
+        latestNote = note;
+      },
+      (state) => {
+        latestState = state;
+      }
+    );
+
+    await engine.bootstrap(true);
+
+    expect(repository.upsertRemote).not.toHaveBeenCalled();
+    expect(latestNote).not.toBeNull();
+    if (!latestNote) {
+      throw new Error("Expected local note to remain during conflict.");
+    }
+    expect(latestNote.content).toBe("local older");
+    expect(latestState).toMatchObject({
+      status: "conflict",
+      hasPendingChanges: true,
+      message: "Hay cambios distintos en otro dispositivo. Elige que version mantener."
+    });
+    expect(latestState?.conflict?.remoteNote.content).toBe("remote wins");
+  });
+
+  it("raises a conflict even when the offline local edit has a later timestamp than the remote change", async () => {
+    let latestState: SyncState | null = null;
+    let latestNote: Note | null = null;
 
     const repository = {
       loadLocal: vi.fn(async () => null),
       saveLocal: vi.fn(async () => undefined),
       fetchRemote: vi.fn(async () =>
         buildNote({
-          id: localNoteId,
-          content: "remote wins",
-          updatedAt: "3026-04-15T10:01:00.000Z"
+          id: "shared-id",
+          content: "cambio remoto",
+          updatedAt: "2026-04-15T10:01:00.000Z"
         })
       ),
       upsertRemote: vi.fn(async (note: Note) => note)
@@ -253,21 +305,21 @@ describe("SyncEngine", () => {
     );
 
     await engine.bootstrap(false);
-    await engine.stageLocalEdit("local older", true);
-    if (!latestNote) {
-      throw new Error("Expected a local note before syncing.");
-    }
-    localNoteId = latestNote.id;
+    await engine.stageLocalEdit("cambio local offline posterior", true);
     await engine.syncNow(true);
 
     expect(repository.upsertRemote).not.toHaveBeenCalled();
-    expect(latestNote.content).toBe("local older");
+    expect(latestNote).not.toBeNull();
+    if (!latestNote) {
+      throw new Error("Expected local note to remain during conflict.");
+    }
+    expect(latestNote.content).toBe("cambio local offline posterior");
     expect(latestState).toMatchObject({
       status: "conflict",
-      hasPendingChanges: true,
-      message: "Hay cambios distintos en otro dispositivo. Elige que version mantener."
+      hasPendingChanges: true
     });
-    expect(latestState?.conflict?.remoteNote.content).toBe("remote wins");
+    expect(latestState?.conflict?.localNote.content).toBe("cambio local offline posterior");
+    expect(latestState?.conflict?.remoteNote.content).toBe("cambio remoto");
   });
 
   it("can keep the local version after a conflict", async () => {
