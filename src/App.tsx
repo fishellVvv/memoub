@@ -1,41 +1,69 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useMemoubApp } from "./hooks/useMemoubApp";
+import { useLocale } from "./hooks/useLocale";
 import { useTheme } from "./hooks/useTheme";
+import type { Locale, LocaleMessages } from "./lib/i18n";
 import { resolveThemeBase, resolveThemeTokens, type ThemeId, type ThemeOverrides, type ThemePreference } from "./lib/theme";
 import type { SyncState } from "./lib/types";
 
 const CUSTOM_COLOR_FIELDS = [
-  { key: "background", label: "Background" },
-  { key: "surface", label: "Surface" },
-  { key: "editor", label: "Editor" },
-  { key: "text", label: "Text" },
-  { key: "muted", label: "Muted" },
-  { key: "accent", label: "Accent" },
-  { key: "success", label: "Success" },
-  { key: "danger", label: "Danger" }
+  { key: "background" },
+  { key: "surface" },
+  { key: "editor" },
+  { key: "text" },
+  { key: "muted" },
+  { key: "accent" },
+  { key: "success" },
+  { key: "danger" }
 ] as const;
 
 const FONT_FAMILY_OPTIONS = [
   {
-    label: "Paper serif",
+    id: "paperSerif",
     value: "\"Iowan Old Style\", \"Palatino Linotype\", \"Book Antiqua\", Georgia, serif"
   },
   {
-    label: "System sans",
+    id: "systemSans",
     value: "\"Segoe UI\", \"Helvetica Neue\", sans-serif"
   },
   {
-    label: "Sea sans",
+    id: "seaSans",
     value: "\"Trebuchet MS\", \"Segoe UI\", \"Helvetica Neue\", sans-serif"
   },
   {
-    label: "Mono",
+    id: "mono",
     value: "\"IBM Plex Mono\", Consolas, \"Courier New\", monospace"
   }
 ] as const;
 
+const THEME_NAME_MAP: Record<ThemeId, string> = {
+  paper: "Paper",
+  sea: "Sea",
+  graphite: "Graphite",
+  matrix: "Matrix"
+};
+
 type CustomColorKey = (typeof CUSTOM_COLOR_FIELDS)[number]["key"];
 type CustomThemePreference = Extract<ThemePreference, { kind: "custom" }>;
+type FontOptionId = (typeof FONT_FAMILY_OPTIONS)[number]["id"];
+
+function formatThemeLabel(
+  theme:
+    | { kind: "system" }
+    | { kind: "custom" }
+    | { kind: "preset"; id: ThemeId; colorScheme: "light" | "dark" },
+  copy: LocaleMessages
+): string {
+  if (theme.kind === "system") {
+    return copy.systemTheme;
+  }
+
+  if (theme.kind === "custom") {
+    return copy.customTheme;
+  }
+
+  return `${THEME_NAME_MAP[theme.id]} (${theme.colorScheme === "dark" ? copy.dark : copy.light})`;
+}
 
 function normalizeHex(color: string): string {
   const sanitized = color.replace("#", "").trim();
@@ -50,12 +78,12 @@ function normalizeHex(color: string): string {
   return `#${sanitized.slice(0, 6)}`;
 }
 
-function formatDate(value: string | null): string {
+function formatDate(value: string | null, locale: Locale, copy: LocaleMessages): string {
   if (!value) {
-    return "Aun sin sincronizar";
+    return copy.noSyncYet;
   }
 
-  return new Intl.DateTimeFormat("es-ES", {
+  return new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-US", {
     dateStyle: "short",
     timeStyle: "short"
   }).format(new Date(value));
@@ -80,29 +108,34 @@ function formatFooterDate(value: string | null): string {
 function previewContent(content: string): string {
   const trimmed = content.trim();
   if (!trimmed) {
-    return "(sin texto)";
+    return "";
   }
 
   return trimmed.length > 140 ? `${trimmed.slice(0, 140)}...` : trimmed;
 }
 
-function normalizeFooterMessage(status: SyncState["status"], message: string | null, hasPendingChanges: boolean): string {
+function normalizeFooterMessage(
+  status: SyncState["status"],
+  message: string | null,
+  hasPendingChanges: boolean,
+  copy: LocaleMessages
+): string {
   switch (status) {
     case "loading":
-      return "preparando...";
+      return copy.footerPreparing;
     case "saving":
-      return "guardando...";
+      return copy.footerSaving;
     case "offline":
-      return "sin conexion";
+      return copy.footerOffline;
     case "error":
-      return "error";
+      return copy.footerError;
     case "conflict":
-      return "conflicto";
+      return copy.footerConflict;
     case "idle":
-      return hasPendingChanges ? "pendiente" : "listo";
+      return hasPendingChanges ? copy.footerPending : copy.footerReady;
     case "saved":
       if (!message) {
-        return "sincronizado";
+        return copy.footerSynced;
       }
 
       if (
@@ -110,20 +143,21 @@ function normalizeFooterMessage(status: SyncState["status"], message: string | n
         message.includes("Nota remota cargada.") ||
         message.includes("Actualizado desde otra sesion.")
       ) {
-        return "actualizado";
+        return copy.footerUpdated;
       }
 
       if (message.includes("Preparado para sincronizar.")) {
-        return "listo";
+        return copy.footerReady;
       }
 
-      return "sincronizado";
+      return copy.footerSynced;
     default:
-      return "listo";
+      return copy.footerReady;
   }
 }
 
 function App() {
+  const { locale, setLocale, messages: copy } = useLocale();
   const { presetThemes, activeThemeId, customThemeActive, systemThemeActive, setSystemTheme, setPresetTheme, setCustomTheme, themePreference, customThemePreference } =
     useTheme();
 
@@ -142,28 +176,29 @@ function App() {
   } = useMemoubApp();
   const [menuOpen, setMenuOpen] = useState(false);
   const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
+  const [localeSelectorOpen, setLocaleSelectorOpen] = useState(false);
   const [customThemeEditorOpen, setCustomThemeEditorOpen] = useState(false);
 
   const statusMeta = useMemo(() => {
     switch (syncState.status) {
       case "loading":
-        return { label: "Cargando", detail: "Preparando tu nota" };
+        return { label: copy.loadingLabel };
       case "saving":
-        return { label: "Guardando", detail: "Subiendo cambios" };
+        return { label: copy.savingLabel };
       case "saved":
-        return { label: "Guardado", detail: "sincronizado" };
+        return { label: copy.savedLabel };
       case "offline":
-        return { label: "Sin conexion", detail: "Guardado en local" };
+        return { label: copy.offlineLabel };
       case "error":
-        return { label: "Error", detail: "Revisa la conexion" };
+        return { label: copy.errorLabel };
       case "conflict":
-        return { label: "Conflicto", detail: "Hace falta elegir version" };
+        return { label: copy.conflictLabel };
       default:
-        return { label: "Listo", detail: "Sin cambios pendientes" };
+        return { label: copy.readyLabel };
     }
-  }, [syncState.status]);
+  }, [copy, syncState.status]);
 
-  const footerDetail = normalizeFooterMessage(syncState.status, syncState.message, syncState.hasPendingChanges);
+  const footerDetail = normalizeFooterMessage(syncState.status, syncState.message, syncState.hasPendingChanges, copy);
   const customThemeBase = useMemo(() => resolveThemeBase(customThemePreference), [customThemePreference]);
   const customPreviewTokens = useMemo(() => resolveThemeTokens(customThemePreference), [customThemePreference]);
 
@@ -175,6 +210,7 @@ function App() {
     if (authState !== "authenticated") {
       setMenuOpen(false);
       setThemeSelectorOpen(false);
+      setLocaleSelectorOpen(false);
       setCustomThemeEditorOpen(false);
     }
   }, [authState]);
@@ -237,15 +273,14 @@ function App() {
     return (
       <main className="shell">
         <section className="card hero-card">
-          <p className="eyebrow">Configuracion pendiente</p>
-          <h1>memoub necesita tu proyecto de Supabase</h1>
+          <p className="eyebrow">{copy.configEyebrow}</p>
+          <h1>{copy.configTitle}</h1>
           <p className="lead">
-            Define <code>VITE_SUPABASE_URL</code> y <code>VITE_SUPABASE_ANON_KEY</code> en un archivo{" "}
-            <code>.env</code> para activar el login y la sincronizacion.
+            {copy.configLeadBefore}
+            <code>VITE_SUPABASE_URL</code> y <code>VITE_SUPABASE_ANON_KEY</code>
+            {copy.configLeadAfter}
           </p>
-          <p className="helper">
-            La app ya incluye cache local y la logica de sync. Solo falta conectar tu proyecto real.
-          </p>
+          <p className="helper">{copy.configHelper}</p>
         </section>
       </main>
     );
@@ -255,14 +290,11 @@ function App() {
     return (
       <main className="shell">
         <section className="card hero-card">
-          <p className="eyebrow">Una nota, dos dispositivos</p>
-          <h1>Escribe en el movil y sigue en Windows sin pensar en nada mas.</h1>
-          <p className="lead">
-            memoub mantiene una unica nota sincronizada mediante Supabase, con cache local para seguir trabajando
-            incluso si la conexion falla un rato.
-          </p>
+          <p className="eyebrow">{copy.authEyebrow}</p>
+          <h1>{copy.authTitle}</h1>
+          <p className="lead">{copy.authLead}</p>
           <button className="primary-button" onClick={() => void signIn()}>
-            Entrar con Google
+            {copy.signInWithGoogle}
           </button>
         </section>
       </main>
@@ -276,7 +308,7 @@ function App() {
         <button
           className="menu-button"
           type="button"
-          aria-label="Abrir menu"
+          aria-label={copy.openMenu}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((current) => !current)}
         >
@@ -286,13 +318,14 @@ function App() {
         </button>
       </header>
 
-      {menuOpen || themeSelectorOpen || customThemeEditorOpen ? (
+      {menuOpen || themeSelectorOpen || localeSelectorOpen || customThemeEditorOpen ? (
         <button
           className="menu-backdrop"
-          aria-label="Cerrar paneles"
+          aria-label={copy.closePanels}
           onClick={() => {
             setMenuOpen(false);
             setThemeSelectorOpen(false);
+            setLocaleSelectorOpen(false);
             setCustomThemeEditorOpen(false);
           }}
         />
@@ -301,7 +334,7 @@ function App() {
       <aside className={`menu-sheet ${menuOpen ? "menu-sheet-open" : ""}`}>
         <div className="menu-group">
           <div className="menu-account">
-            <span className="menu-item-detail">{userEmail}</span>
+            <span className="menu-item-detail">{userEmail || copy.noEmail}</span>
           </div>
         </div>
         <div className="menu-group">
@@ -313,7 +346,17 @@ function App() {
               setThemeSelectorOpen(true);
             }}
           >
-            <span>Cambiar tema</span>
+            <span>{copy.changeTheme}</span>
+          </button>
+          <button
+            className="menu-item-button"
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              setLocaleSelectorOpen(true);
+            }}
+          >
+            {copy.changeLanguage}
           </button>
         </div>
         <div className="menu-group">
@@ -325,7 +368,7 @@ function App() {
               void retrySync();
             }}
           >
-            Forzar sincronizacion
+            {copy.forceSync}
           </button>
           <button
             className="menu-item-button menu-item-button-danger"
@@ -335,14 +378,14 @@ function App() {
               void signOut();
             }}
           >
-            Cerrar sesion
+            {copy.signOut}
           </button>
         </div>
       </aside>
 
       {themeSelectorOpen ? (
-        <section className="theme-modal" role="dialog" aria-modal="true" aria-label="Selector de temas">
-          <div className="theme-selector" role="list" aria-label="Selector de temas">
+        <section className="theme-modal" role="dialog" aria-modal="true" aria-label={copy.themeSelectorLabel}>
+          <div className="theme-selector" role="list" aria-label={copy.themeSelectorLabel}>
             {presetThemes.map((theme) => {
               const isActive =
                 theme.kind === "system"
@@ -402,8 +445,21 @@ function App() {
                     }}
                   >
                     <span className="theme-option-copy">
-                      <span className="theme-option-label">{theme.label}</span>
-                      {isActive ? <span className="theme-option-mark">activo</span> : null}
+                      <span className="theme-option-label">
+                        {theme.kind === "system"
+                          ? formatThemeLabel({ kind: "system" }, copy)
+                          : theme.kind === "custom"
+                            ? formatThemeLabel({ kind: "custom" }, copy)
+                            : formatThemeLabel(
+                                {
+                                  kind: "preset",
+                                  id: theme.id,
+                                  colorScheme: previewBase?.colorScheme ?? "light"
+                                },
+                                copy
+                              )}
+                      </span>
+                      {isActive ? <span className="theme-option-mark">{copy.active}</span> : null}
                     </span>
                   </button>
                   <button
@@ -462,8 +518,52 @@ function App() {
         </section>
       ) : null}
 
+      {localeSelectorOpen ? (
+        <section className="theme-modal" role="dialog" aria-modal="true" aria-label={copy.languageSelectorLabel}>
+          <div className="theme-selector" role="list" aria-label={copy.languageSelectorLabel}>
+            {([
+              { id: "es", label: "Español", code: "ES" },
+              { id: "en", label: "English", code: "EN" }
+            ] as const).map((option) => {
+              const isActive = locale === option.id;
+
+              return (
+                <div key={option.id} className={`theme-option ${isActive ? "theme-option-active" : ""}`}>
+                  <button
+                    className="theme-option-main"
+                    type="button"
+                    onClick={() => {
+                      setLocale(option.id);
+                      setLocaleSelectorOpen(false);
+                    }}
+                  >
+                    <span className="theme-option-copy">
+                      <span className="theme-option-label">{option.label}</span>
+                      {isActive ? <span className="theme-option-mark">{copy.active}</span> : null}
+                    </span>
+                  </button>
+                  <button
+                    className="theme-option-preview-button"
+                    type="button"
+                    onClick={() => {
+                      setLocale(option.id);
+                      setLocaleSelectorOpen(false);
+                    }}
+                  >
+                    <span className="theme-option-preview" aria-hidden="true">
+                      <span className="theme-option-preview-top" />
+                      <span className="theme-option-preview-note">{option.code}</span>
+                    </span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
       {customThemeEditorOpen ? (
-        <section className="custom-theme-modal" role="dialog" aria-modal="true" aria-label="Editor de tema custom">
+        <section className="custom-theme-modal" role="dialog" aria-modal="true" aria-label={`${copy.customTheme} editor`}>
           <div className="custom-theme-sheet">
             <div className="custom-theme-preview" style={customPreviewStyle}>
               <div className="custom-theme-preview-shell">
@@ -476,12 +576,14 @@ function App() {
                   </span>
                 </div>
                 <div className="custom-theme-preview-body">
-                  <p className="custom-theme-preview-note">nota custom</p>
-                  <p className="custom-theme-preview-copy">ajusta colores y fuente hasta dar con tu tono.</p>
+                  <p className="custom-theme-preview-note">{copy.customNote}</p>
+                  <p className="custom-theme-preview-copy">{copy.customPreviewCopy}</p>
                 </div>
                 <div className="custom-theme-preview-footer">
                   <span className="custom-theme-preview-dot" />
-                  <span className="custom-theme-preview-status">2026-04-15 | 21:14:59 | sincronizado</span>
+                  <span className="custom-theme-preview-status">
+                    2026-04-15 | 21:14:59 | {copy.footerSynced}
+                  </span>
                   <span className="custom-theme-preview-status-samples" aria-hidden="true">
                     <span className="custom-theme-preview-dot custom-theme-preview-dot-saving" />
                     <span className="custom-theme-preview-dot custom-theme-preview-dot-danger" />
@@ -493,15 +595,15 @@ function App() {
             <div className="custom-theme-controls">
               <div className="custom-theme-toolbar">
                 <button className="custom-theme-reset" type="button" onClick={resetCustomTheme}>
-                  Reset custom
+                  {copy.resetCustom}
                 </button>
 
                 <label className="custom-theme-font">
-                  <span className="custom-theme-control-label">Font family</span>
+                  <span className="custom-theme-control-label">{copy.fontFamily}</span>
                   <select value={customThemeBase.fontFamily} onChange={(event) => updateCustomFontFamily(event.target.value)}>
                     {FONT_FAMILY_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {copy.fontOptions[option.id as FontOptionId]}
                       </option>
                     ))}
                   </select>
@@ -514,7 +616,7 @@ function App() {
 
                   return (
                     <label key={field.key} className="custom-theme-color-row">
-                      <span className="custom-theme-control-label">{field.label}</span>
+                      <span className="custom-theme-control-label">{copy.colorLabels[field.key]}</span>
                       <span className="custom-theme-color-inputs">
                         <input
                           className="custom-theme-color-picker"
@@ -534,14 +636,14 @@ function App() {
       ) : null}
 
       <label className="sr-only" htmlFor="note-editor">
-        Nota sincronizada
+        {copy.synchronizedNoteLabel}
       </label>
       <textarea
         id="note-editor"
         className="note-surface"
         value={noteContent}
         onChange={(event) => void setNoteContent(event.target.value)}
-        placeholder="Escribe aqui. Tus cambios se guardan solos."
+        placeholder={copy.notePlaceholder}
         disabled={Boolean(syncState.conflict)}
         spellCheck
       />
@@ -549,25 +651,25 @@ function App() {
       {syncState.conflict ? (
         <section className="conflict-sheet">
           <div className="conflict-sheet-copy">
-            <p className="eyebrow">Conflicto detectado</p>
-            <h2>Hay dos versiones distintas de la nota.</h2>
-            <p>Elige si quieres conservar lo escrito en este dispositivo o recuperar la version remota guardada.</p>
+            <p className="eyebrow">{copy.conflictEyebrow}</p>
+            <h2>{copy.conflictTitle}</h2>
+            <p>{copy.conflictBody}</p>
           </div>
           <div className="conflict-grid">
             <article className="conflict-card">
-              <p className="conflict-title">Version local</p>
-              <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt)}</p>
-              <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content)}</p>
+              <p className="conflict-title">{copy.localVersion}</p>
+              <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt, locale, copy)}</p>
+              <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content) || copy.noText}</p>
               <button className="primary-button" onClick={() => void keepLocalConflictVersion()}>
-                Mantener mi version
+                {copy.keepLocalVersion}
               </button>
             </article>
             <article className="conflict-card">
-              <p className="conflict-title">Version remota</p>
-              <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt)}</p>
-              <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content)}</p>
+              <p className="conflict-title">{copy.remoteVersion}</p>
+              <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt, locale, copy)}</p>
+              <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content) || copy.noText}</p>
               <button className="ghost-button" onClick={() => void useRemoteConflictVersion()}>
-                Usar version remota
+                {copy.useRemoteVersion}
               </button>
             </article>
           </div>

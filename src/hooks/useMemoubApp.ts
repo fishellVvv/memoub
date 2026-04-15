@@ -243,7 +243,7 @@ export function useMemoubApp() {
     retrySync,
     keepLocalConflictVersion,
     useRemoteConflictVersion,
-    userEmail: user?.email ?? "Sin email",
+    userEmail: user?.email ?? "",
     isConfigured: appConfig.isSupabaseConfigured
   };
 }
