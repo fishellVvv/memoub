@@ -129,6 +129,100 @@ describe("SyncEngine", () => {
     });
   });
 
+  it("applies a newer remote note during refresh", async () => {
+    let latestNote: Note | null = null;
+    let latestState: SyncState | null = null;
+
+    const repository = {
+      loadLocal: vi.fn(async () => null),
+      saveLocal: vi.fn(async () => undefined),
+      fetchRemote: vi
+        .fn<() => Promise<Note | null>>()
+        .mockResolvedValueOnce(
+          buildNote({
+            content: "nota inicial",
+            updatedAt: "2026-04-15T10:00:00.000Z"
+          })
+        )
+        .mockResolvedValueOnce(
+          buildNote({
+            content: "nota desde otra sesion",
+            updatedAt: "2026-04-15T10:00:10.000Z"
+          })
+        ),
+      upsertRemote: vi.fn(async (note: Note) => note)
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      (note) => {
+        latestNote = note;
+      },
+      (state) => {
+        latestState = state;
+      }
+    );
+
+    await engine.bootstrap(true);
+    await engine.refreshFromRemote(true);
+
+    expect(latestNote).not.toBeNull();
+    if (!latestNote) {
+      throw new Error("Expected refreshed note.");
+    }
+    expect(latestNote.content).toBe("nota desde otra sesion");
+    expect(latestState).toMatchObject({
+      status: "saved",
+      hasPendingChanges: false,
+      message: "Actualizado desde otra sesion."
+    });
+  });
+
+  it("does not replace local pending edits during remote refresh", async () => {
+    let latestNote: Note | null = null;
+
+    const repository = {
+      loadLocal: vi.fn(async () => null),
+      saveLocal: vi.fn(async () => undefined),
+      fetchRemote: vi
+        .fn<() => Promise<Note | null>>()
+        .mockResolvedValueOnce(
+          buildNote({
+            content: "nota inicial",
+            updatedAt: "2026-04-15T10:00:00.000Z"
+          })
+        )
+        .mockResolvedValueOnce(
+          buildNote({
+            content: "cambio remoto",
+            updatedAt: "2026-04-15T10:00:10.000Z"
+          })
+        ),
+      upsertRemote: vi.fn(async (note: Note) => note)
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      (note) => {
+        latestNote = note;
+      },
+      () => undefined
+    );
+
+    await engine.bootstrap(true);
+    await engine.stageLocalEdit("edicion local pendiente", true);
+    await engine.refreshFromRemote(true);
+
+    expect(latestNote).not.toBeNull();
+    if (!latestNote) {
+      throw new Error("Expected local note to remain.");
+    }
+    expect(latestNote.content).toBe("edicion local pendiente");
+    expect(repository.fetchRemote).toHaveBeenCalledTimes(1);
+  });
+
   it("prefers the newer remote note even when both versions share the same id", async () => {
     let latestNote: Note | null = null;
     let localNoteId = "shared-id";

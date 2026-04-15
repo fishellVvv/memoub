@@ -14,6 +14,7 @@ const DEFAULT_SYNC_STATE: SyncState = {
 };
 
 type AuthState = "loading" | "anonymous" | "authenticated";
+const REMOTE_REFRESH_INTERVAL_MS = 4000;
 
 export function useMemoubApp() {
   const authService = useMemo(() => new AuthService(), []);
@@ -24,6 +25,11 @@ export function useMemoubApp() {
   const [syncState, setSyncState] = useState<SyncState>(DEFAULT_SYNC_STATE);
   const syncEngineRef = useRef<SyncEngine | null>(null);
   const syncTaskRef = useRef(createDebouncedTask(async () => undefined, 700));
+  const syncStateRef = useRef<SyncState>(DEFAULT_SYNC_STATE);
+
+  useEffect(() => {
+    syncStateRef.current = syncState;
+  }, [syncState]);
 
   useEffect(() => {
     if (!appConfig.isSupabaseConfigured) {
@@ -135,6 +141,55 @@ export function useMemoubApp() {
       window.removeEventListener("online", handleOnline);
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const refreshRemoteNote = async () => {
+      const currentSyncState = syncStateRef.current;
+
+      if (!syncEngineRef.current || !window.navigator.onLine) {
+        return;
+      }
+
+      if (currentSyncState.hasPendingChanges || currentSyncState.status === "saving" || currentSyncState.status === "loading") {
+        return;
+      }
+
+      try {
+        await syncEngineRef.current.refreshFromRemote(true);
+      } catch {
+        return;
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void refreshRemoteNote();
+      }
+    }, REMOTE_REFRESH_INTERVAL_MS);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void refreshRemoteNote();
+      }
+    };
+
+    const handleFocus = () => {
+      void refreshRemoteNote();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [user]);
 
   const setNoteContent = async (content: string) => {
     setNoteContentState(content);

@@ -211,6 +211,46 @@ export class SyncEngine {
     }
   }
 
+  async refreshFromRemote(isOnline: boolean): Promise<Note | null> {
+    if (!isOnline || this.syncState.hasPendingChanges) {
+      return this.currentNote;
+    }
+
+    const remoteNote = await this.repository.fetchRemote(this.userId);
+    if (!remoteNote) {
+      return this.currentNote;
+    }
+
+    if (!this.currentNote) {
+      this.currentNote = remoteNote;
+      this.updateNote(remoteNote);
+      await this.repository.saveLocal(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
+      this.setState({
+        status: "saved",
+        hasPendingChanges: false,
+        lastSyncedAt: remoteNote.updatedAt,
+        message: "Nota remota cargada."
+      });
+      return remoteNote;
+    }
+
+    const preferredNote = choosePreferredNote(this.currentNote, remoteNote);
+    if (preferredNote !== remoteNote) {
+      return this.currentNote;
+    }
+
+    this.currentNote = remoteNote;
+    this.updateNote(remoteNote);
+    await this.repository.saveLocal(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
+    this.setState({
+      status: "saved",
+      hasPendingChanges: false,
+      lastSyncedAt: remoteNote.updatedAt,
+      message: "Actualizado desde otra sesion."
+    });
+    return remoteNote;
+  }
+
   private setState(partial: Partial<SyncState>): void {
     this.syncState = {
       ...this.syncState,
