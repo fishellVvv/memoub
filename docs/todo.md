@@ -10,18 +10,17 @@
 - Guardado y persistencia de la nota validados
 - Sincronizacion automatica entre dos sesiones validada
 - Flujo Android -> Windows validado
-- Acceso externo temporal validado para pruebas reales en movil
+- Produccion desplegada en Vercel
+- Login y sincronizacion validados en produccion
 
 ## Siguiente linea de desarrollo
 
 - Validar comportamiento offline y resincronizacion de extremo a extremo
-- Preparar despliegue de produccion con su configuracion final de auth
+- Mejorar UX de estados y mensajes de sincronizacion
 
 ## Pendiente funcional
 
-- Desplegar el frontend en Vercel o similar
-- Configurar variables de entorno en el hosting
-- Anadir la URL de produccion a Google OAuth y Supabase Auth
+- Documentar una rutina simple de release y verificaciones post-deploy
 
 ## Temas a pulir
 

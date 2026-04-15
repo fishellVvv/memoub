@@ -10,10 +10,11 @@
 - Cache local con soporte offline basico
 - Sincronizacion automatica entre sesiones abiertas
 - Flujo validado entre Android y Windows
+- Despliegue en produccion funcionando en Vercel
 
 ## Limitacion actual
 
-El flujo principal ya esta validado entre movil y escritorio, pero todavia falta validar a fondo el comportamiento offline y cerrar el despliegue de produccion.
+El flujo principal ya esta validado en local y en produccion, pero todavia falta validar a fondo el comportamiento offline y pulir algunos estados de sincronizacion.
 
 ## Stack
 
@@ -44,5 +45,5 @@ El flujo principal ya esta validado entre movil y escritorio, pero todavia falta
 
 ## Despliegue
 
-La app esta pensada para desplegarse como sitio estatico en Vercel, Netlify o similar.
-Configura las variables de entorno del paso anterior en el hosting.
+La app ya esta desplegada en Vercel y el login en produccion ha quedado validado.
+Para nuevos despliegues, manten configuradas en el hosting las mismas variables de entorno usadas en local.
