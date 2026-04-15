@@ -13,6 +13,8 @@ La idea es que cada archivo de tema contenga solo la intención cromática princ
 - scrollbar
 - variantes suaves
 
+Este sistema ya esta implementado y sirve como base del selector de temas y del editor `Custom`.
+
 ## Comportamiento por defecto
 Si el usuario **no ha elegido un tema explícito**, la app sigue el modo del sistema operativo del dispositivo:
 
@@ -32,7 +34,7 @@ Eso incluye:
 En futuras apps empaquetadas para Android y Windows se mantendrá esta misma regla: persistencia local por dispositivo.
 
 ## Tokens base
-Cada tema deberá declarar solo estos 8 valores:
+Cada tema declara solo estos 8 valores:
 
 ```ts
 type ThemeBase = {
@@ -76,7 +78,7 @@ type ThemeBase = {
   Error, acción destructiva y estado de red problemática.
 
 ## Tokens derivados
-Estos no se definirán manualmente en los temas; saldrán de los 8 tokens base.
+Estos no se definen manualmente en los temas; salen de los 8 tokens base.
 
 ### Texto
 
@@ -146,7 +148,7 @@ Estos no se definirán manualmente en los temas; saldrán de los 8 tokens base.
 - `scrollbar-thumb-hover` -> derivado de `text` o `accent`
 
 ## Estrategia técnica
-Los derivados se calcularán en TypeScript, no en CSS.
+Los derivados se calculan en TypeScript, no en CSS.
 
 Motivos:
 
@@ -155,11 +157,11 @@ Motivos:
 - menos dependencia de soporte de `color-mix()`
 - más sencillo exportar/importar temas custom en el futuro
 
-## Estructura objetivo
+## Estructura actual
 
 ```text
 src/themes/types.ts
-src/themes/base/
+src/themes/
   paper.ts
   sea.ts
   graphite.ts
@@ -185,24 +187,15 @@ export const paperTheme: ThemeBase = {
 ```
 
 ### El resolver
-`src/lib/theme.ts` tendrá que:
+`src/lib/theme.ts` se encarga de:
 
 1. recibir un `ThemeBase`
 2. generar `ThemeTokens`
 3. aplicar variables CSS
 4. persistir preferencia
 
-## Orden de implementación recomendado
-
-1. Crear `ThemeBase` con solo 8 colores.
-2. Crear el generador de derivados.
-3. Migrar un solo tema primero: `paper`.
-4. Verificar visualmente que el resultado es correcto.
-5. Migrar `sea`, `graphite` y `matrix`.
-6. Eliminar tokens antiguos de los archivos de tema.
-
 ## Criterio de éxito
-Consideraremos la migración bien hecha cuando:
+Consideramos el sistema bien resuelto cuando:
 
 - cada tema tenga solo 8 colores manuales
 - el CSS siga consumiendo variables finales, no colores hardcodeados

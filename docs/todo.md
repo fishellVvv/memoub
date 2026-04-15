@@ -14,24 +14,29 @@
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
 - Resolucion manual de conflicto local/remoto validada
+- Sistema de temas con presets `paper`, `sea`, `graphite`, `matrix` y `custom` implementado
+- Opcion `Tema de sistema` implementada con seguimiento local de `light` y `dark`
+- Editor visual del tema `Custom` implementado con persistencia local por dispositivo
 
 ## Siguiente linea de desarrollo
 
 - Diseñar la interfaz mobile-first partiendo de la spec Android
+- Seguir puliendo la experiencia mobile-first y el acabado visual
+- Refinar la UX del selector de temas y del editor `Custom`
 - Mejorar UX de estados y mensajes de sincronizacion
-- Refinar la experiencia del panel de conflicto
 - Documentar una rutina simple de release y verificaciones post-deploy
 
 ## Pendiente funcional
 
-- Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 - Adaptar la experiencia de Windows a la base Android-first
+- Valorar si conviene anadir import/export o presets compartibles para `Custom`
+- Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 
 ## Temas a pulir
 
 - Mejorar mensajes de error y estados de sync
-- Añadir indicador mas claro cuando hay cambios pendientes
-- Revisar estrategia de conflicto si dos dispositivos editan mucho a la vez
+- Revisar accesibilidad y contraste de algunos temas
+- Probar el editor `Custom` en pantallas pequenas y tactiles
 - Reducir peso del bundle inicial si hiciera falta
 - Revisar las vulnerabilidades reportadas por `npm install`
 - Añadir tests de integracion del flujo con Supabase

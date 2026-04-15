@@ -13,10 +13,12 @@
 - Conflictos offline detectados con eleccion entre version local y remota
 - Flujo validado entre Android y Windows
 - Despliegue en produccion funcionando en Vercel
+- Sistema de temas local por dispositivo funcionando
+- Selector de temas con presets, modo sistema y tema `Custom` funcionando
 
 ## Limitacion actual
 
-El flujo principal ya esta validado en local y en produccion. Lo siguiente es pulir mejor la experiencia de sincronizacion y endurecer algunos casos limite.
+El flujo principal ya esta validado en local y en produccion. Lo siguiente es pulir mejor la experiencia mobile-first, el editor visual de temas y algunos casos limite de sincronizacion.
 
 ## Direccion de producto
 
@@ -29,6 +31,7 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 - Supabase Auth + Postgres
 - IndexedDB para cache local y soporte offline basico
 - `vite-plugin-pwa` para instalacion y cache de la shell
+- Sistema de temas local con presets, modo sistema y `Custom`
 
 ## Desarrollo
 
