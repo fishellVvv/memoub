@@ -23,4 +23,4 @@
 
 - Auth con Google ya conectado a Supabase
 - Guardado remoto y cache local ya operativos
-- La sincronizacion entre sesiones abiertas sigue siendo manual en la version actual
+- La sincronizacion entre sesiones abiertas ya se actualiza automaticamente

@@ -8,18 +8,16 @@
 - Variables locales de entorno configuradas
 - Login validado en local
 - Guardado y persistencia de la nota validados
-- Sincronizacion manual entre dos sesiones validada
+- Sincronizacion automatica entre dos sesiones validada
 
 ## Siguiente linea de desarrollo
 
-- Anadir sincronizacion automatica entre sesiones abiertas sin depender de `Reintentar sync` o recargar
-- Decidir si la actualizacion en vivo se resuelve con Supabase Realtime, polling o una combinacion simple
-- Validar que la sesion de Windows refleje cambios hechos desde otra sesion en pocos segundos
+- Validar comportamiento offline y resincronizacion de extremo a extremo
+- Probar el flujo real desde Android
+- Preparar despliegue de produccion con su configuracion final de auth
 
 ## Pendiente funcional
 
-- Validar comportamiento offline y resincronizacion de extremo a extremo
-- Probar el flujo desde Android real
 - Desplegar el frontend en Vercel o similar
 - Configurar variables de entorno en el hosting
 - Anadir la URL de produccion a Google OAuth y Supabase Auth

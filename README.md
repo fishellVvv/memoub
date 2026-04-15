@@ -8,12 +8,11 @@
 - Guardado de la nota funcionando en Supabase
 - Persistencia correcta al recargar la aplicacion
 - Cache local con soporte offline basico
-- Sincronizacion manual entre sesiones abierta mediante recarga o `Reintentar sync`
+- Sincronizacion automatica entre sesiones abiertas
 
 ## Limitacion actual
 
-La sincronizacion entre dos sesiones abiertas no se actualiza sola todavia.  
-La siguiente linea de desarrollo es anadir actualizacion automatica en vivo al detectar cambios remotos.
+La sincronizacion ya se actualiza sola entre sesiones abiertas, pero todavia falta validar a fondo el comportamiento offline en distintos dispositivos y cerrar el despliegue de produccion.
 
 ## Stack
 
@@ -34,7 +33,7 @@ La siguiente linea de desarrollo es anadir actualizacion automatica en vivo al d
 
 - No subas `.env`, claves secretas ni credenciales OAuth privadas
 - Usa solo la clave publica de Supabase en el frontend
-- Mantiene el repo publico libre de URLs privadas de entornos no publicos o credenciales pegadas en ejemplos
+- Manten el repo publico libre de URLs privadas de entornos no publicos o credenciales pegadas en ejemplos
 
 ## Scripts
 
