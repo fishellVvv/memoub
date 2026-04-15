@@ -24,3 +24,4 @@
 - Auth con Google ya conectado a Supabase
 - Guardado remoto y cache local ya operativos
 - La sincronizacion entre sesiones abiertas ya se actualiza automaticamente
+- El flujo entre Android y Windows ya se ha probado correctamente

@@ -9,11 +9,12 @@
 - Login validado en local
 - Guardado y persistencia de la nota validados
 - Sincronizacion automatica entre dos sesiones validada
+- Flujo Android -> Windows validado
+- Acceso externo temporal validado para pruebas reales en movil
 
 ## Siguiente linea de desarrollo
 
 - Validar comportamiento offline y resincronizacion de extremo a extremo
-- Probar el flujo real desde Android
 - Preparar despliegue de produccion con su configuracion final de auth
 
 ## Pendiente funcional

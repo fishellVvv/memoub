@@ -9,10 +9,11 @@
 - Persistencia correcta al recargar la aplicacion
 - Cache local con soporte offline basico
 - Sincronizacion automatica entre sesiones abiertas
+- Flujo validado entre Android y Windows
 
 ## Limitacion actual
 
-La sincronizacion ya se actualiza sola entre sesiones abiertas, pero todavia falta validar a fondo el comportamiento offline en distintos dispositivos y cerrar el despliegue de produccion.
+El flujo principal ya esta validado entre movil y escritorio, pero todavia falta validar a fondo el comportamiento offline y cerrar el despliegue de produccion.
 
 ## Stack
 
