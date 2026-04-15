@@ -1,22 +1,28 @@
 # TODO de `memoub`
 
-## Pendiente para dejarlo usable
+## Hecho
 
-- Crear `.env` desde `.env.example`
-- Configurar `VITE_SUPABASE_URL`
-- Configurar `VITE_SUPABASE_ANON_KEY`
-- Ejecutar `supabase/schema.sql` en el proyecto Supabase
-- Activar login con Google en Supabase Auth
-- Añadir las redirect URLs del entorno local y del deploy
+- Proyecto Supabase creado
+- Tabla `notes` y politicas RLS aplicadas
+- Login con Google configurado en Supabase
+- Variables locales de entorno configuradas
+- Login validado en local
+- Guardado y persistencia de la nota validados
+- Sincronizacion manual entre dos sesiones validada
 
-## Desarrollo siguiente
+## Siguiente linea de desarrollo
 
-- Probar flujo completo de login en local
-- Verificar que la primera nota se crea correctamente en Supabase
-- Validar sincronizacion real entre Android y Windows
-- Validar comportamiento offline y resincronizacion
+- Anadir sincronizacion automatica entre sesiones abiertas sin depender de `Reintentar sync` o recargar
+- Decidir si la actualizacion en vivo se resuelve con Supabase Realtime, polling o una combinacion simple
+- Validar que la sesion de Windows refleje cambios hechos desde otra sesion en pocos segundos
+
+## Pendiente funcional
+
+- Validar comportamiento offline y resincronizacion de extremo a extremo
+- Probar el flujo desde Android real
 - Desplegar el frontend en Vercel o similar
 - Configurar variables de entorno en el hosting
+- Anadir la URL de produccion a Google OAuth y Supabase Auth
 
 ## Temas a pulir
 
@@ -27,3 +33,4 @@
 - Revisar las vulnerabilidades reportadas por `npm install`
 - Añadir tests de integracion del flujo con Supabase
 - Añadir pruebas manuales documentadas para instalacion PWA en Windows y Android
+- Mantener fuera del repo publico cualquier clave secreta, client secret o configuracion sensible

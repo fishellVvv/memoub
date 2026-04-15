@@ -2,6 +2,19 @@
 
 `memoub` es una PWA minima para editar una unica nota y mantenerla sincronizada entre Windows y Android.
 
+## Estado actual
+
+- Login con Google funcionando en local
+- Guardado de la nota funcionando en Supabase
+- Persistencia correcta al recargar la aplicacion
+- Cache local con soporte offline basico
+- Sincronizacion manual entre sesiones abierta mediante recarga o `Reintentar sync`
+
+## Limitacion actual
+
+La sincronizacion entre dos sesiones abiertas no se actualiza sola todavia.  
+La siguiente linea de desarrollo es anadir actualizacion automatica en vivo al detectar cambios remotos.
+
 ## Stack
 
 - React + TypeScript + Vite
@@ -12,10 +25,16 @@
 ## Desarrollo
 
 1. Instala dependencias con `npm install`.
-2. Copia `.env.example` a `.env` y rellena `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+2. Copia `.env.example` a `.env` y rellena `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` con la URL del proyecto y la clave publica de Supabase.
 3. Aplica la SQL de [`supabase/schema.sql`](supabase/schema.sql) en tu proyecto de Supabase.
 4. Activa el proveedor Google en Supabase Auth y anade la URL del frontend en los redirect URLs.
 5. Ejecuta `npm run dev`.
+
+## Seguridad del repo
+
+- No subas `.env`, claves secretas ni credenciales OAuth privadas
+- Usa solo la clave publica de Supabase en el frontend
+- Mantiene el repo publico libre de URLs privadas de entornos no publicos o credenciales pegadas en ejemplos
 
 ## Scripts
 

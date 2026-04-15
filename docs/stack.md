@@ -18,3 +18,9 @@
 - Autosave con debounce
 - Sincronizacion simple con criterio **last write wins**
 - Soporte offline basico con copia local y reintento al volver la conexion
+
+## Estado implementado
+
+- Auth con Google ya conectado a Supabase
+- Guardado remoto y cache local ya operativos
+- La sincronizacion entre sesiones abiertas sigue siendo manual en la version actual
