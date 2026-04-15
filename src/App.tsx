@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMemoubApp } from "./hooks/useMemoubApp";
+import type { SyncState } from "./lib/types";
 
 function formatDate(value: string | null): string {
   if (!value) {
@@ -12,6 +13,22 @@ function formatDate(value: string | null): string {
   }).format(new Date(value));
 }
 
+function formatFooterDate(value: string | null): string {
+  if (!value) {
+    return "---- -- -- | --:--:-- |";
+  }
+
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} | ${hours}:${minutes}:${seconds} |`;
+}
+
 function previewContent(content: string): string {
   const trimmed = content.trim();
   if (!trimmed) {
@@ -19,6 +36,43 @@ function previewContent(content: string): string {
   }
 
   return trimmed.length > 140 ? `${trimmed.slice(0, 140)}...` : trimmed;
+}
+
+function normalizeFooterMessage(status: SyncState["status"], message: string | null, hasPendingChanges: boolean): string {
+  switch (status) {
+    case "loading":
+      return "preparando...";
+    case "saving":
+      return "guardando...";
+    case "offline":
+      return "sin conexion";
+    case "error":
+      return "error";
+    case "conflict":
+      return "conflicto";
+    case "idle":
+      return hasPendingChanges ? "pendiente" : "listo";
+    case "saved":
+      if (!message) {
+        return "sincronizado";
+      }
+
+      if (
+        message.includes("La version remota era mas reciente.") ||
+        message.includes("Nota remota cargada.") ||
+        message.includes("Actualizado desde otra sesion.")
+      ) {
+        return "actualizado";
+      }
+
+      if (message.includes("Preparado para sincronizar.")) {
+        return "listo";
+      }
+
+      return "sincronizado";
+    default:
+      return "listo";
+  }
 }
 
 function App() {
@@ -35,29 +89,38 @@ function App() {
     userEmail,
     isConfigured
   } = useMemoubApp();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const statusLabel = useMemo(() => {
+  const statusMeta = useMemo(() => {
     switch (syncState.status) {
       case "loading":
-        return "Cargando";
+        return { label: "Cargando", detail: "Preparando tu nota" };
       case "saving":
-        return "Guardando";
+        return { label: "Guardando", detail: "Subiendo cambios" };
       case "saved":
-        return "Guardado";
+        return { label: "Guardado", detail: "sincronizado" };
       case "offline":
-        return "Sin conexion";
+        return { label: "Sin conexion", detail: "Guardado en local" };
       case "error":
-        return "Error";
+        return { label: "Error", detail: "Revisa la conexion" };
       case "conflict":
-        return "Conflicto";
+        return { label: "Conflicto", detail: "Hace falta elegir version" };
       default:
-        return "Listo";
+        return { label: "Listo", detail: "Sin cambios pendientes" };
     }
   }, [syncState.status]);
+
+  const footerDetail = normalizeFooterMessage(syncState.status, syncState.message, syncState.hasPendingChanges);
 
   useEffect(() => {
     document.title = noteContent.trim() ? `${noteContent.trim().slice(0, 24)} - memoub` : "memoub";
   }, [noteContent]);
+
+  useEffect(() => {
+    if (authState !== "authenticated") {
+      setMenuOpen(false);
+    }
+  }, [authState]);
 
   if (!isConfigured) {
     return (
@@ -96,71 +159,61 @@ function App() {
   }
 
   return (
-    <main className="shell shell-app">
-      <section className="card app-card">
-        <header className="app-header">
-          <div>
-            <p className="eyebrow">memoub</p>
-            <h1>Tu unica nota</h1>
-          </div>
-          <div className="header-actions">
-            <div className={`status-badge status-${syncState.status}`}>
-              <span>{statusLabel}</span>
-              <span className="status-separator">|</span>
-              <span>{formatDate(syncState.lastSyncedAt)}</span>
-            </div>
-            <button className="ghost-button" onClick={() => void retrySync()}>
-              Reintentar sync
-            </button>
-            <button className="ghost-button" onClick={() => void signOut()}>
-              Salir
-            </button>
-          </div>
-        </header>
+    <main className="app-screen">
+      <header className="mobile-header">
+        <p className="brand-label">memoub</p>
+        <button
+          className="menu-button"
+          type="button"
+          aria-label="Abrir menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((current) => !current)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </header>
 
-        <div className="app-meta">
-          <span>{userEmail}</span>
-          {syncState.hasPendingChanges ? <span>Cambios pendientes</span> : <span>Todo al dia</span>}
-          {syncState.message ? <span>{syncState.message}</span> : null}
+      {menuOpen ? <button className="menu-backdrop" aria-label="Cerrar menu" onClick={() => setMenuOpen(false)} /> : null}
+
+      <aside className={`menu-sheet ${menuOpen ? "menu-sheet-open" : ""}`}>
+        <div className="menu-group">
+          <div className="menu-account">
+            <span className="menu-item-detail">{userEmail}</span>
+          </div>
         </div>
+        <div className="menu-group">
+          <button
+            className="menu-item-button"
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              void retrySync();
+            }}
+          >
+            Forzar sincronizacion
+          </button>
+          <button
+            className="menu-item-button menu-item-button-danger"
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              void signOut();
+            }}
+          >
+            Cerrar sesion
+          </button>
+        </div>
+      </aside>
 
-        {syncState.conflict ? (
-          <section className="conflict-panel">
-            <div className="conflict-copy">
-              <p className="eyebrow">Conflicto detectado</p>
-              <h2>Hay cambios distintos en otro dispositivo.</h2>
-              <p>
-                Elige si quieres conservar lo que escribiste en este dispositivo o recuperar la version remota ya
-                guardada.
-              </p>
-            </div>
-            <div className="conflict-grid">
-              <article className="conflict-card">
-                <p className="conflict-title">Tu version local</p>
-                <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt)}</p>
-                <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content)}</p>
-                <button className="primary-button" onClick={() => void keepLocalConflictVersion()}>
-                  Mantener mi version
-                </button>
-              </article>
-              <article className="conflict-card">
-                <p className="conflict-title">Version remota</p>
-                <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt)}</p>
-                <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content)}</p>
-                <button className="ghost-button" onClick={() => void useRemoteConflictVersion()}>
-                  Usar version remota
-                </button>
-              </article>
-            </div>
-          </section>
-        ) : null}
-
-        <label className="editor-label" htmlFor="note-editor">
+      <section className="editor-stage">
+        <label className="sr-only" htmlFor="note-editor">
           Nota sincronizada
         </label>
         <textarea
           id="note-editor"
-          className="note-editor"
+          className="note-surface"
           value={noteContent}
           onChange={(event) => void setNoteContent(event.target.value)}
           placeholder="Escribe aqui. Tus cambios se guardan solos."
@@ -168,6 +221,51 @@ function App() {
           spellCheck
         />
       </section>
+
+      {syncState.conflict ? (
+        <section className="conflict-sheet">
+          <div className="conflict-sheet-copy">
+            <p className="eyebrow">Conflicto detectado</p>
+            <h2>Hay dos versiones distintas de la nota.</h2>
+            <p>Elige si quieres conservar lo escrito en este dispositivo o recuperar la version remota guardada.</p>
+          </div>
+          <div className="conflict-grid">
+            <article className="conflict-card">
+              <p className="conflict-title">Version local</p>
+              <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt)}</p>
+              <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content)}</p>
+              <button className="primary-button" onClick={() => void keepLocalConflictVersion()}>
+                Mantener mi version
+              </button>
+            </article>
+            <article className="conflict-card">
+              <p className="conflict-title">Version remota</p>
+              <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt)}</p>
+              <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content)}</p>
+              <button className="ghost-button" onClick={() => void useRemoteConflictVersion()}>
+                Usar version remota
+              </button>
+            </article>
+          </div>
+        </section>
+      ) : null}
+
+      <footer className={`mobile-footer footer-${syncState.status}`}>
+        <div className="footer-status-block">
+          <span
+            className={`status-orb status-orb-${syncState.status}`}
+            title={statusMeta.label}
+            aria-label={statusMeta.label}
+          />
+          <div className="footer-copy">
+            <div className="footer-inline">
+              <span className="footer-secondary">{formatFooterDate(syncState.lastSyncedAt)}</span>
+              <span className="footer-tertiary">{footerDetail}</span>
+            </div>
+          </div>
+        </div>
+        {syncState.hasPendingChanges ? <span className="footer-pill">Pendiente</span> : null}
+      </footer>
     </main>
   );
 }
