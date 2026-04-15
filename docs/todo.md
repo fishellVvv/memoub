@@ -17,12 +17,15 @@
 - Sistema de temas con presets `paper`, `sea`, `graphite`, `matrix` y `custom` implementado
 - Opcion `Tema de sistema` implementada con seguimiento local de `light` y `dark`
 - Editor visual del tema `Custom` implementado con persistencia local por dispositivo
+- Selector de idioma con `es` y `en` implementado
+- Fallback al idioma del sistema implementado con ingles por defecto fuera de variantes del espanol
 
 ## Siguiente linea de desarrollo
 
 - Diseñar la interfaz mobile-first partiendo de la spec Android
 - Seguir puliendo la experiencia mobile-first y el acabado visual
 - Refinar la UX del selector de temas y del editor `Custom`
+- Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
 - Documentar una rutina simple de release y verificaciones post-deploy
 

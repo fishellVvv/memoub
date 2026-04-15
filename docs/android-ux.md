@@ -48,8 +48,9 @@ La version de Windows se adaptara despues a esta logica de uso, no al reves.
 
 Opciones aprobadas por ahora:
 
-- `Sincronizar ahora`
-- `Estado de la cuenta`
+- `Cambiar tema`
+- `Cambiar idioma`
+- `Forzar sincronizacion`
 - `Cerrar sesion`
 
 ## Consecuencias para diseño
@@ -58,6 +59,7 @@ Opciones aprobadas por ahora:
 - La version de escritorio sera una adaptacion de esta experiencia
 - El estilo debe evitar apariencia de dashboard o formulario
 - Los estados de sincronizacion tienen que ser discretos pero claros
+- Tema e idioma deben poder personalizarse por dispositivo sin depender de la cuenta
 
 ## Consecuencias para roadmap
 

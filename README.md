@@ -15,6 +15,7 @@
 - Despliegue en produccion funcionando en Vercel
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
+- Selector de idioma con `es` y `en`, con fallback al idioma del sistema
 
 ## Limitacion actual
 
@@ -32,6 +33,7 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 - IndexedDB para cache local y soporte offline basico
 - `vite-plugin-pwa` para instalacion y cache de la shell
 - Sistema de temas local con presets, modo sistema y `Custom`
+- Localizacion ligera con selector manual y fallback al idioma del sistema
 
 ## Desarrollo
 

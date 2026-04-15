@@ -16,8 +16,9 @@
 - Una sola nota por usuario
 - Texto plano, sin rich text
 - Autosave con debounce
-- Sincronizacion simple con criterio **last write wins**
+- Sincronizacion con deteccion de conflicto y eleccion explicita entre local y remota
 - Soporte offline basico con copia local y reintento al volver la conexion
+- Preferencias visuales e idioma guardados localmente por dispositivo
 
 ## Estado implementado
 
@@ -28,3 +29,5 @@
 - Los conflictos entre version local y remota ya se resuelven con eleccion explicita
 - El flujo entre Android y Windows ya se ha probado correctamente
 - El despliegue en Vercel y el acceso en produccion ya se han validado
+- El sistema de temas ya incluye presets, modo sistema y editor `Custom`
+- El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`
