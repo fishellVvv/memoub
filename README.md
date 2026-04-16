@@ -63,6 +63,7 @@ La siguiente fase toma **Android como experiencia principal** y mantiene un enfo
 Base de esa direccion:
 
 - [Spec Android-first](docs/android-ux.md)
+- [Spec Windows](docs/windows-ux.md)
 - [Sistema de temas](docs/theme-system.md)
 
 ## Version web
@@ -79,6 +80,12 @@ Base de esa direccion:
 Detalle tecnico:
 
 - [Flujo manual de release Android](docs/android-release.md)
+
+## Version Windows
+
+- La experiencia esperada de Windows ya esta definida
+- Objetivo: app residente, icono en barra y apertura rapida con ventana propia
+- Direccion UX: [Spec Windows](docs/windows-ux.md)
 
 ## Stack
 
@@ -120,5 +127,6 @@ Detalle tecnico:
 - [TODO del proyecto](docs/todo.md)
 - [Stack](docs/stack.md)
 - [UX Android](docs/android-ux.md)
+- [UX Windows](docs/windows-ux.md)
 - [Sistema de temas](docs/theme-system.md)
 - [Release Android manual](docs/android-release.md)

@@ -25,6 +25,7 @@
 - Selector de idioma con `es` y `en` implementado
 - Fallback al idioma del sistema implementado con ingles por defecto fuera de variantes del espanol
 - Sistema tipografico migrado a fuentes libres con subsets optimizados para `es` y `en`
+- Direccion UX de Windows documentada
 
 ## Siguiente linea de desarrollo
 
@@ -33,6 +34,7 @@
 - Refinar la UX del selector de temas y del editor `Custom`
 - Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
+- Decidir arquitectura Windows en base a la spec documentada
 
 ## Pendiente funcional
 
