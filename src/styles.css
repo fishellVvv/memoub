@@ -830,12 +830,11 @@ code {
 
 .conflict-sheet {
   position: fixed;
-  top: max(0.8rem, calc(env(safe-area-inset-top) + 0.2rem));
+  top: calc(env(safe-area-inset-top) + 4.85rem);
   left: 50%;
-  bottom: auto;
+  bottom: calc(env(safe-area-inset-bottom) + 4.85rem);
   z-index: 18;
   width: min(42rem, calc(100vw - 1.6rem));
-  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 6.8rem);
   transform: translateX(-50%);
   padding: 1rem;
   border: 1px solid var(--conflict-border);
