@@ -47,6 +47,7 @@ export type LocaleMessages = {
   customTheme: string;
   customNote: string;
   customPreviewCopy: string;
+  saveChanges: string;
   resetCustom: string;
   fontFamily: string;
   colorLabels: {
@@ -60,10 +61,13 @@ export type LocaleMessages = {
     danger: string;
   };
   fontOptions: {
-    paperSerif: string;
-    systemSans: string;
-    seaSans: string;
-    mono: string;
+    sourceSerif4: string;
+    ibmPlexSerif: string;
+    sourceSans3: string;
+    ibmPlexSans: string;
+    atkinsonHyperlegible: string;
+    ibmPlexMono: string;
+    jetbrainsMono: string;
   };
   synchronizedNoteLabel: string;
   notePlaceholder: string;
@@ -123,6 +127,7 @@ const messages: Record<Locale, LocaleMessages> = {
     customTheme: "Custom",
     customNote: "nota custom",
     customPreviewCopy: "ajusta colores y fuente hasta dar con tu tono.",
+    saveChanges: "Guardar cambios",
     resetCustom: "Reset custom",
     fontFamily: "Font family",
     colorLabels: {
@@ -136,10 +141,13 @@ const messages: Record<Locale, LocaleMessages> = {
       danger: "Danger"
     },
     fontOptions: {
-      paperSerif: "Paper serif",
-      systemSans: "System sans",
-      seaSans: "Sea sans",
-      mono: "Mono"
+      sourceSerif4: "Source Serif 4",
+      ibmPlexSerif: "IBM Plex Serif",
+      sourceSans3: "Source Sans 3",
+      ibmPlexSans: "IBM Plex Sans",
+      atkinsonHyperlegible: "Atkinson Hyperlegible",
+      ibmPlexMono: "IBM Plex Mono",
+      jetbrainsMono: "JetBrains Mono"
     },
     synchronizedNoteLabel: "Nota sincronizada",
     notePlaceholder: "Escribe aqui. Tus cambios se guardan solos.",
@@ -197,6 +205,7 @@ const messages: Record<Locale, LocaleMessages> = {
     customTheme: "Custom",
     customNote: "custom note",
     customPreviewCopy: "adjust colors and type until it feels right.",
+    saveChanges: "Save changes",
     resetCustom: "Reset custom",
     fontFamily: "Font family",
     colorLabels: {
@@ -210,10 +219,13 @@ const messages: Record<Locale, LocaleMessages> = {
       danger: "Danger"
     },
     fontOptions: {
-      paperSerif: "Paper serif",
-      systemSans: "System sans",
-      seaSans: "Sea sans",
-      mono: "Mono"
+      sourceSerif4: "Source Serif 4",
+      ibmPlexSerif: "IBM Plex Serif",
+      sourceSans3: "Source Sans 3",
+      ibmPlexSans: "IBM Plex Sans",
+      atkinsonHyperlegible: "Atkinson Hyperlegible",
+      ibmPlexMono: "IBM Plex Mono",
+      jetbrainsMono: "JetBrains Mono"
     },
     synchronizedNoteLabel: "Synced note",
     notePlaceholder: "Write here. Your changes save automatically.",

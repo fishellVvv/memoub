@@ -19,20 +19,32 @@ const CUSTOM_COLOR_FIELDS = [
 
 const FONT_FAMILY_OPTIONS = [
   {
-    id: "paperSerif",
-    value: "\"Iowan Old Style\", \"Palatino Linotype\", \"Book Antiqua\", Georgia, serif"
+    id: "sourceSerif4",
+    value: "\"Source Serif 4 Variable\", Georgia, serif"
   },
   {
-    id: "systemSans",
-    value: "\"Segoe UI\", \"Helvetica Neue\", sans-serif"
+    id: "ibmPlexSerif",
+    value: "\"IBM Plex Serif\", Georgia, serif"
   },
   {
-    id: "seaSans",
-    value: "\"Trebuchet MS\", \"Segoe UI\", \"Helvetica Neue\", sans-serif"
+    id: "sourceSans3",
+    value: "\"Source Sans 3 Variable\", sans-serif"
   },
   {
-    id: "mono",
-    value: "\"IBM Plex Mono\", Consolas, \"Courier New\", monospace"
+    id: "ibmPlexSans",
+    value: "\"IBM Plex Sans Variable\", sans-serif"
+  },
+  {
+    id: "atkinsonHyperlegible",
+    value: "\"Atkinson Hyperlegible\", sans-serif"
+  },
+  {
+    id: "ibmPlexMono",
+    value: "\"IBM Plex Mono\", monospace"
+  },
+  {
+    id: "jetbrainsMono",
+    value: "\"JetBrains Mono Variable\", monospace"
   }
 ] as const;
 
@@ -241,6 +253,11 @@ function App() {
 
   const resetCustomTheme = () => {
     setCustomTheme({}, "paper");
+  };
+
+  const saveCustomTheme = () => {
+    applyCustomPreference(customThemePreference.overrides, customThemePreference.baseThemeId);
+    setCustomThemeEditorOpen(false);
   };
 
   const customPreviewStyle = {
@@ -594,6 +611,10 @@ function App() {
 
             <div className="custom-theme-controls">
               <div className="custom-theme-toolbar">
+                <button className="custom-theme-save" type="button" onClick={saveCustomTheme}>
+                  {copy.saveChanges}
+                </button>
+
                 <button className="custom-theme-reset" type="button" onClick={resetCustomTheme}>
                   {copy.resetCustom}
                 </button>

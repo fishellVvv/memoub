@@ -9,7 +9,7 @@ export const paperTheme: ThemeBase = {
   accent: "#16313c",
   success: "#4f8b60",
   danger: "#b05347",
-  fontFamily: "\"Iowan Old Style\", \"Palatino Linotype\", \"Book Antiqua\", Georgia, serif",
+  fontFamily: "\"Source Serif 4 Variable\", \"IBM Plex Serif\", Georgia, serif",
   colorScheme: "light",
   fontSizeScale: 1,
   letterSpacing: "-0.01em",

@@ -9,7 +9,7 @@ export const seaTheme: ThemeBase = {
   accent: "#12313b",
   success: "#4f8b60",
   danger: "#b05f52",
-  fontFamily: "\"Trebuchet MS\", \"Segoe UI\", \"Helvetica Neue\", sans-serif",
+  fontFamily: "\"Source Sans 3 Variable\", \"IBM Plex Sans Variable\", sans-serif",
   colorScheme: "light",
   fontSizeScale: 1,
   letterSpacing: "0em",

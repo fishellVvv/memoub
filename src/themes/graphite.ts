@@ -9,7 +9,7 @@ export const graphiteTheme: ThemeBase = {
   accent: "#e8ecef",
   success: "#71c48a",
   danger: "#ff8f7d",
-  fontFamily: "\"Segoe UI\", \"Helvetica Neue\", sans-serif",
+  fontFamily: "\"IBM Plex Sans Variable\", \"Source Sans 3 Variable\", sans-serif",
   colorScheme: "dark",
   fontSizeScale: 0.98,
   letterSpacing: "-0.01em",

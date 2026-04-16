@@ -9,7 +9,7 @@ export const matrixTheme: ThemeBase = {
   accent: "#8df6a1",
   success: "#8df6a1",
   danger: "#ff7a8f",
-  fontFamily: "\"IBM Plex Mono\", Consolas, \"Courier New\", monospace",
+  fontFamily: "\"IBM Plex Mono\", \"JetBrains Mono Variable\", monospace",
   colorScheme: "dark",
   fontSizeScale: 0.96,
   letterSpacing: "0.01em",
