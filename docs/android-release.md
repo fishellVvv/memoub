@@ -97,8 +97,11 @@ Para que Android actualice correctamente una APK instalada manualmente:
 1. Probar cambios en debug
 2. Subir `versionCode` y `versionName`
 3. Ejecutar `./gradlew.bat assembleRelease`
-4. Probar la APK release en un dispositivo real
-5. Distribuirla manualmente
+4. Renombrar la APK con version visible, por ejemplo:
+   - `memoub-android-v1.0.1.apk`
+5. Probar la APK release en un dispositivo real
+6. Subirla a GitHub Releases
+7. Distribuirla manualmente
 
 ## Distribucion manual
 
@@ -114,3 +117,14 @@ Nota:
 - Gmail suele bloquear adjuntos `.apk`
 - para correo o almacenamiento intermedio, puede hacer falta renombrar temporalmente el archivo
 
+## Convencion recomendada para futuras versiones
+
+- Tag GitHub: `android-v1.0.1`
+- Titulo de la release: `memoub Android v1.0.1`
+- Asset principal: `memoub-android-v1.0.1.apk`
+
+Ventaja:
+
+- el historial queda claro para ti
+- quien llegue al repo puede usar siempre la pagina de `latest release`
+- no hace falta mantener enlaces duros a una version concreta dentro del README
