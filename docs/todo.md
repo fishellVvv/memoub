@@ -14,6 +14,7 @@
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
 - Resolucion manual de conflicto local/remoto validada
+- Panel de conflicto ajustado visualmente para movil con scroll interno
 - Sistema de temas con presets `paper`, `sea`, `graphite`, `matrix` y `custom` implementado
 - Opcion `Tema de sistema` implementada con seguimiento local de `light` y `dark`
 - Editor visual del tema `Custom` implementado con persistencia local por dispositivo

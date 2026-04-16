@@ -11,6 +11,7 @@
 - Sincronizacion automatica entre sesiones abiertas
 - Resincronizacion tras volver desde offline validada
 - Conflictos offline detectados con eleccion entre version local y remota
+- Panel de conflicto mobile-first ya ajustado visualmente
 - Flujo validado entre Android y Windows
 - Despliegue en produccion funcionando en Vercel
 - Sistema de temas local por dispositivo funcionando
