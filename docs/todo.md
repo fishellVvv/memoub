@@ -12,6 +12,8 @@
 - Flujo Android -> Windows validado
 - App Android nativa empaquetada con Capacitor e instalada en dispositivo real
 - Login nativo de Google validado dentro de la app Android
+- APK release firmada validada para distribucion manual fuera de Google Play
+- Flujo manual de build Android release documentado
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -31,12 +33,12 @@
 - Refinar la UX del selector de temas y del editor `Custom`
 - Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
-- Documentar una rutina simple de release y verificaciones post-deploy
 
 ## Pendiente funcional
 
 - Adaptar la experiencia de Windows a la base Android-first
 - Decidir si Windows se quedara como PWA instalada o pasara a empaquetado nativo
+- Decidir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 

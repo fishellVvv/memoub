@@ -5,6 +5,7 @@
 - **Frontend**: React 19 + TypeScript + Vite
 - **PWA**: `vite-plugin-pwa`
 - **Android nativo**: Capacitor + Android Studio
+- **Distribucion Android actual**: APK release firmada para reparto manual
 - **Backend**: Supabase
 - **Auth web**: Google OAuth con Supabase Auth
 - **Auth Android**: Google Sign-In nativo + `signInWithIdToken` de Supabase
@@ -35,6 +36,7 @@
 - El flujo entre Android y Windows ya se ha probado correctamente
 - La app Android nativa ya se ha instalado y validado en dispositivo real
 - El login nativo de Google dentro de Android ya se ha validado
+- La APK release firmada ya se ha generado y validado para distribucion manual
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

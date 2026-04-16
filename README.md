@@ -55,6 +55,7 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 - El empaquetado usa Capacitor con `appId` `com.fishellvvv.memoub`
 - El login en Android ya no depende del navegador: usa Google nativo y `signInWithIdToken` de Supabase
 - Para compilar la app necesitas Android Studio y un `VITE_GOOGLE_WEB_CLIENT_ID` valido en `.env`
+- El flujo manual de APK release firmada esta documentado en [`docs/android-release.md`](docs/android-release.md)
 
 ## Seguridad del repo
 
@@ -72,3 +73,8 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 
 La app ya esta desplegada en Vercel y el login en produccion ha quedado validado.
 Para nuevos despliegues, manten configuradas en el hosting las mismas variables de entorno usadas en local.
+
+## Distribucion Android
+
+La app Android ya puede generarse como **APK release firmada** para distribucion manual fuera de Google Play.
+El flujo de firma, build y versionado esta en [`docs/android-release.md`](docs/android-release.md).

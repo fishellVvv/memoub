@@ -9,3 +9,6 @@ coverage
 .vscode/
 *.tsbuildinfo
 npm-debug.log*
+android/keystore.properties
+android/*.jks
+android/*.keystore
