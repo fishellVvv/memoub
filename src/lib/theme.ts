@@ -145,7 +145,9 @@ function buildShadow(opacity: number, blur: number, spread: number, strength: nu
 function deriveThemeTokens(base: ThemeBase): ThemeTokens {
   const dark = base.colorScheme === "dark";
   const contrastLight = "#ffffff";
-  const conflictBlend = mix(mix(base.surface, base.accent, 0.18), base.danger, 0.14);
+  const conflictSurface = mix(base.surface, base.background, dark ? 0.12 : 0.22);
+  const conflictCardSurface = mix(base.editor, base.surface, dark ? 0.22 : 0.3);
+  const conflictBorder = mix(base.text, base.surface, dark ? 0.3 : 0.42);
   const loadingColor = mix(base.muted, base.text, 0.45);
   const radiusSmall = Math.max(0, base.radius * 0.45);
   const radiusMedium = Math.max(0, base.radius);
@@ -173,8 +175,8 @@ function deriveThemeTokens(base: ThemeBase): ThemeTokens {
     "note-surface": base.editor,
     "card-surface": alpha(mix(base.surface, base.background, 0.38), dark ? 0.9 : 0.86),
     "menu-surface": alpha(base.surface, dark ? 0.98 : 0.96),
-    "conflict-surface": alpha(conflictBlend, dark ? 0.96 : 0.94),
-    "conflict-card-surface": alpha(mix(base.editor, base.surface, 0.25), dark ? 0.9 : 0.82),
+    "conflict-surface": alpha(conflictSurface, dark ? 0.96 : 0.94),
+    "conflict-card-surface": alpha(conflictCardSurface, dark ? 0.94 : 0.84),
     "code-surface": alpha(base.text, 0.08),
     "ghost-surface": alpha(base.text, dark ? 0.08 : 0.06),
     "scrollbar-track": alpha(mix(base.editor, base.surface, 0.35), dark ? 0.34 : 0.18),
@@ -186,8 +188,8 @@ function deriveThemeTokens(base: ThemeBase): ThemeTokens {
     "line-strong": alpha(base.text, dark ? 0.24 : 0.18),
     "card-border": alpha(base.text, dark ? 0.1 : 0.1),
     "ghost-border": alpha(base.text, dark ? 0.14 : 0.1),
-    "conflict-border": alpha(mix(base.accent, base.danger, 0.5), dark ? 0.32 : 0.24),
-    "conflict-card-border": alpha(base.text, dark ? 0.12 : 0.08),
+    "conflict-border": alpha(conflictBorder, dark ? 0.28 : 0.18),
+    "conflict-card-border": alpha(base.text, dark ? 0.14 : 0.08),
     overlay: alpha(dark ? "#000000" : base.text, dark ? 0.44 : 0.22),
     "card-shadow": buildShadow(dark ? 0.34 : 0.16, 28, 80, base.shadowStrength),
     "menu-shadow": buildShadow(dark ? 0.42 : 0.18, 22, 55, base.shadowStrength),
