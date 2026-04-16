@@ -13,11 +13,13 @@
 - Conflictos offline detectados con eleccion entre version local y remota
 - Panel de conflicto mobile-first ya ajustado visualmente
 - Flujo validado entre Android y Windows
+- App Android nativa empaquetada con Capacitor y validada en dispositivo real
 - Despliegue en produccion funcionando en Vercel
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
 - Sistema tipografico local con fuentes libres y subsets optimizados para `es` y `en`
+- Login nativo de Google validado dentro de la app Android
 
 ## Limitacion actual
 
@@ -34,6 +36,7 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 - Supabase Auth + Postgres
 - IndexedDB para cache local y soporte offline basico
 - `vite-plugin-pwa` para instalacion y cache de la shell
+- Capacitor para empaquetado Android nativo
 - Sistema de temas local con presets, modo sistema y `Custom`
 - Localizacion ligera con selector manual y fallback al idioma del sistema
 - Fuentes libres autoalojadas con subsets `latin` y `latin-ext`
@@ -45,6 +48,13 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 3. Aplica la SQL de [`supabase/schema.sql`](supabase/schema.sql) en tu proyecto de Supabase.
 4. Activa el proveedor Google en Supabase Auth y anade la URL del frontend en los redirect URLs.
 5. Ejecuta `npm run dev`.
+
+## Android nativo
+
+- El proyecto Android vive en [`android/`](android)
+- El empaquetado usa Capacitor con `appId` `com.fishellvvv.memoub`
+- El login en Android ya no depende del navegador: usa Google nativo y `signInWithIdToken` de Supabase
+- Para compilar la app necesitas Android Studio y un `VITE_GOOGLE_WEB_CLIENT_ID` valido en `.env`
 
 ## Seguridad del repo
 

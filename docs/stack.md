@@ -4,8 +4,10 @@
 
 - **Frontend**: React 19 + TypeScript + Vite
 - **PWA**: `vite-plugin-pwa`
+- **Android nativo**: Capacitor + Android Studio
 - **Backend**: Supabase
-- **Auth**: Google OAuth con Supabase Auth
+- **Auth web**: Google OAuth con Supabase Auth
+- **Auth Android**: Google Sign-In nativo + `signInWithIdToken` de Supabase
 - **Base de datos**: Postgres en Supabase
 - **Cache local**: IndexedDB
 - **Testing**: Vitest
@@ -14,6 +16,7 @@
 ## Enfoque funcional
 
 - Una sola aplicacion web instalable en **Windows** y **Android**
+- Una app Android nativa empaquetada a partir de la misma base web
 - Una sola nota por usuario
 - Texto plano, sin rich text
 - Autosave con debounce
@@ -30,6 +33,8 @@
 - La resincronizacion al volver desde offline ya se ha validado
 - Los conflictos entre version local y remota ya se resuelven con eleccion explicita
 - El flujo entre Android y Windows ya se ha probado correctamente
+- La app Android nativa ya se ha instalado y validado en dispositivo real
+- El login nativo de Google dentro de Android ya se ha validado
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

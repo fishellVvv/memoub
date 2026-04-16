@@ -10,6 +10,8 @@
 - Guardado y persistencia de la nota validados
 - Sincronizacion automatica entre dos sesiones validada
 - Flujo Android -> Windows validado
+- App Android nativa empaquetada con Capacitor e instalada en dispositivo real
+- Login nativo de Google validado dentro de la app Android
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -34,6 +36,7 @@
 ## Pendiente funcional
 
 - Adaptar la experiencia de Windows a la base Android-first
+- Decidir si Windows se quedara como PWA instalada o pasara a empaquetado nativo
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 

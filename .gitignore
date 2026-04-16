@@ -1,8 +1,11 @@
 node_modules
 dist
 coverage
+.android-user/
 .env
 .env.local
 .DS_Store
+.idea/
+.vscode/
 *.tsbuildinfo
 npm-debug.log*
