@@ -20,6 +20,7 @@
 - Editor visual del tema `Custom` implementado con persistencia local por dispositivo
 - Selector de idioma con `es` y `en` implementado
 - Fallback al idioma del sistema implementado con ingles por defecto fuera de variantes del espanol
+- Sistema tipografico migrado a fuentes libres con subsets optimizados para `es` y `en`
 
 ## Siguiente linea de desarrollo
 
@@ -41,7 +42,7 @@
 - Mejorar mensajes de error y estados de sync
 - Revisar accesibilidad y contraste de algunos temas
 - Probar el editor `Custom` en pantallas pequenas y tactiles
-- Reducir peso del bundle inicial si hiciera falta
+- Vigilar si el bundle de fuentes sigue necesitando mas recorte en el futuro
 - Revisar las vulnerabilidades reportadas por `npm install`
 - Añadir tests de integracion del flujo con Supabase
 - Añadir pruebas manuales documentadas para instalacion PWA en Windows y Android

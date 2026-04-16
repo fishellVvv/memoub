@@ -17,6 +17,7 @@
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
+- Sistema tipografico local con fuentes libres y subsets optimizados para `es` y `en`
 
 ## Limitacion actual
 
@@ -35,6 +36,7 @@ La definicion base de esa experiencia esta en [`docs/android-ux.md`](docs/androi
 - `vite-plugin-pwa` para instalacion y cache de la shell
 - Sistema de temas local con presets, modo sistema y `Custom`
 - Localizacion ligera con selector manual y fallback al idioma del sistema
+- Fuentes libres autoalojadas con subsets `latin` y `latin-ext`
 
 ## Desarrollo
 

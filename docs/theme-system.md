@@ -100,7 +100,7 @@ Estos no se definen manualmente en los temas; salen de los 8 tokens base.
 - `note-surface` -> `editor`
 - `card-surface` -> mezcla de `surface` con `background`
 - `menu-surface` -> `surface`
-- `conflict-surface` -> mezcla de `surface`, `accent` y un poco de `danger`
+- `conflict-surface` -> mezcla neutra de `surface` y `background`
 - `conflict-card-surface` -> mezcla de `editor` con `surface`
 - `code-surface` -> `text` con baja opacidad
 - `ghost-surface` -> `text` con muy baja opacidad
@@ -116,7 +116,7 @@ Estos no se definen manualmente en los temas; salen de los 8 tokens base.
 - `line-strong` -> misma base, con más presencia
 - `card-border` -> derivado de `line`
 - `ghost-border` -> derivado de `line-strong`
-- `conflict-border` -> mezcla de `accent` con `danger`
+- `conflict-border` -> derivado neutro de `line-strong`
 - `conflict-card-border` -> derivado de `line`
 
 ### Overlay y sombras

@@ -9,6 +9,7 @@
 - **Base de datos**: Postgres en Supabase
 - **Cache local**: IndexedDB
 - **Testing**: Vitest
+- **Tipografia**: fuentes libres autoalojadas con subsets `latin` y `latin-ext`
 
 ## Enfoque funcional
 
@@ -19,6 +20,7 @@
 - Sincronizacion con deteccion de conflicto y eleccion explicita entre local y remota
 - Soporte offline basico con copia local y reintento al volver la conexion
 - Preferencias visuales e idioma guardados localmente por dispositivo
+- Tipografia local por bundle, sin depender de fuentes propietarias del sistema
 
 ## Estado implementado
 
@@ -31,3 +33,4 @@
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`
+- Las fuentes del proyecto ya usan familias libres aptas para uso comercial y cargadas con subsets optimizados
