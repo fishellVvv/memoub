@@ -6,19 +6,19 @@
 
 <p align="center">
   <a href="https://github.com/fishellVvv/memoub/releases/download/android-v1.0.0/memoub-android-v1.0.0.apk">
-    <img alt="Descargar ultima version Android" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Android-2ea44f?style=for-the-badge&logo=android&logoColor=white">
+    <img alt="Descargar ultima version Android" src="docs/assets/badge-android.svg">
   </a>
 </p>
 
 <p align="center">
   <a href="https://github.com/fishellVvv/memoub/releases/download/windows-v1.0.2/memoub_1.0.2_x64-setup.exe">
-    <img alt="Descargar ultima version Windows" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Windows-0078d4?style=for-the-badge&logo=windows&logoColor=white">
+    <img alt="Descargar ultima version Windows" src="docs/assets/badge-windows.svg">
   </a>
 </p>
 
 <p align="center">
   <a href="https://memoub.vercel.app">
-    <img alt="Abrir version web" src="https://img.shields.io/badge/Abrir%20version%20web-111111?style=for-the-badge&logo=vercel&logoColor=white">
+    <img alt="Abrir version web" src="docs/assets/badge-web.svg">
   </a>
 </p>
 
