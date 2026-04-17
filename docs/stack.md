@@ -5,6 +5,7 @@
 - **Frontend**: React 19 + TypeScript + Vite
 - **PWA**: `vite-plugin-pwa`
 - **Android nativo**: Capacitor + Android Studio
+- **Windows nativo**: Tauri
 - **Distribucion Android actual**: APK release firmada para reparto manual
 - **Backend**: Supabase
 - **Auth web**: Google OAuth con Supabase Auth
@@ -16,8 +17,9 @@
 
 ## Enfoque funcional
 
-- Una sola aplicacion web instalable en **Windows** y **Android**
+- Una sola base web compartida entre **Android** y **Windows**
 - Una app Android nativa empaquetada a partir de la misma base web
+- Una futura app Windows nativa empaquetada con Tauri
 - Una sola nota por usuario
 - Texto plano, sin rich text
 - Autosave con debounce
@@ -37,6 +39,10 @@
 - La app Android nativa ya se ha instalado y validado en dispositivo real
 - El login nativo de Google dentro de Android ya se ha validado
 - La APK release firmada ya se ha generado y validado para distribucion manual
+- La base nativa de Windows con Tauri ya esta inicializada en el repo
+- La shell Windows ya abre como ventana nativa y usa tray residente
+- El cierre a tray, la reapertura desde tray y el autostart ya estan implementados
+- La preview de la nota desde el tray ya esta implementada con tema y texto sincronizados
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

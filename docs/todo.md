@@ -14,6 +14,13 @@
 - Login nativo de Google validado dentro de la app Android
 - APK release firmada validada para distribucion manual fuera de Google Play
 - Flujo manual de build Android release documentado
+- Arquitectura Windows fijada en Tauri
+- Base Tauri inicializada para la futura app Windows
+- Shell Windows nativa funcionando con Tauri
+- Ventana Windows con tamano inicial de escritorio implementada
+- Cierre a tray y reapertura desde tray implementados
+- Opcion de iniciar con Windows implementada desde el menu del tray
+- Preview de la nota en el tray implementada y ajustada visualmente
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -34,12 +41,13 @@
 - Refinar la UX del selector de temas y del editor `Custom`
 - Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
-- Decidir arquitectura Windows en base a la spec documentada
+- Empaquetar y validar la app Windows fuera del entorno de desarrollo
 
 ## Pendiente funcional
 
-- Adaptar la experiencia de Windows a la base Android-first
-- Decidir si Windows se quedara como PWA instalada o pasara a empaquetado nativo
+- Validar instalacion y distribucion real de la app Windows
+- Definir flujo de release Windows equivalente al de Android
+- Revisar si la preview del tray necesita una iteracion final de usabilidad
 - Decidir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado

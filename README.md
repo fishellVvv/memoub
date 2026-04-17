@@ -51,6 +51,8 @@ Si te han pasado este repo solo para instalar la app, haz esto:
 - Flujo validado entre Android y Windows
 - App Android nativa empaquetada con Capacitor y validada en dispositivo real
 - APK release firmada validada para distribucion manual fuera de Google Play
+- App Windows nativa empaquetada con Tauri funcionando en local
+- Shell Windows con tray, cierre a tray, arranque con Windows y preview de la nota implementados
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
@@ -83,8 +85,11 @@ Detalle tecnico:
 
 ## Version Windows
 
-- La experiencia esperada de Windows ya esta definida
-- Objetivo: app residente, icono en barra y apertura rapida con ventana propia
+- Base tecnica fijada: Tauri
+- Shell Windows nativa ya arrancando en local
+- Ventana principal con tamano inicial de escritorio y comportamiento nativo
+- Tray residente con reapertura rapida, cierre a tray y preview de la nota
+- Arranque con Windows configurable desde el menu del tray
 - Direccion UX: [Spec Windows](docs/windows-ux.md)
 
 ## Stack
@@ -94,6 +99,7 @@ Detalle tecnico:
 - IndexedDB para cache local y soporte offline basico
 - `vite-plugin-pwa` para instalacion y cache de la shell
 - Capacitor para empaquetado Android nativo
+- Tauri para la futura app Windows nativa
 - Sistema de temas local con presets, modo sistema y `Custom`
 - Localizacion ligera con selector manual y fallback al idioma del sistema
 - Fuentes libres autoalojadas con subsets `latin` y `latin-ext`

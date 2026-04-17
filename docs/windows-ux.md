@@ -21,11 +21,21 @@ La idea no es replicar la web sin mas, sino ofrecer una presencia discreta y con
 - Icono permanente en la bandeja o zona equivalente de la barra de tareas
 - Apertura manual solo cuando el usuario quiera interactuar con la ventana
 
+Estado actual de esta linea:
+
+- base nativa implementada con Tauri
+- tray residente funcionando
+- arranque con Windows configurable desde el menu del tray
+- ventana principal con comportamiento nativo ya operativa
+- preview de la nota sobre el tray ya implementada
+
 ## Comportamiento del icono
 
 - `memoub` debe vivir en la barra de tareas o bandeja de sistema como app residente
 - El icono debe ser reconocible y estable
 - Al pasar el raton por encima, debe aparecer una previsualizacion util
+- Al cerrar la ventana principal, la app debe seguir viva en tray
+- Desde el tray debe poder reabrirse la ventana principal rapidamente
 
 ## Tooltip o previsualizacion
 
@@ -41,6 +51,12 @@ Objetivo:
 
 - permitir leer sin abrir la ventana principal
 - usar `memoub` como nota siempre disponible de un vistazo
+
+Estado actual:
+
+- la preview ya se resuelve como una mini ventana nativa asociada al tray
+- ya sigue el tema activo y muestra texto + linea final de sincronizacion
+- sigue siendo una zona razonable para pulido fino de UX si hiciera falta
 
 ## Ventana principal
 
@@ -58,6 +74,13 @@ Una vez abierta:
 - se puede maximizar
 - debe comportarse como una aplicacion normal de Windows
 
+Estado actual:
+
+- la ventana ya abre como shell nativa de Tauri
+- el tamano inicial actual es de escritorio ligero
+- se puede mover, redimensionar, minimizar y maximizar
+- al cerrar, vuelve a tray en lugar de cerrar la app entera
+
 ## Relacion con Android
 
 - Android sigue siendo la referencia del producto para escritura rapida y experiencia mobile-first
@@ -73,12 +96,12 @@ Esta UX apunta mejor a una solucion de escritorio empaquetada que a una PWA pura
 - control de ventana nativo
 - previsualizacion asociada al icono
 
-La opcion mas natural a evaluar en esta fase es:
+La base tecnica fijada para esta fase es:
 
 - **Tauri** para Windows
 
 ## Consecuencias para roadmap
 
-- Primero: cerrar esta spec de experiencia Windows
-- Despues: decidir si Windows se resuelve con PWA instalada o con empaquetado nativo
-- Si se busca cumplir esta UX completa, la via mas probable es empaquetado nativo
+- Primero: usar Tauri como base nativa de Windows
+- Despues: seguir puliendo la shell ya implementada y preparar distribucion real
+- Si se quiere cumplir esta UX completa, la via fijada es empaquetado nativo
