@@ -11,6 +11,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/fishellVvv/memoub/releases/latest">
+    <img alt="Descargar ultima version Windows" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white">
+  </a>
+</p>
+
+<p align="center">
   <a href="https://memoub.vercel.app">
     <img alt="Abrir version web" src="https://img.shields.io/badge/Abrir%20version%20web-111111?style=for-the-badge&logo=vercel&logoColor=white">
   </a>
@@ -38,6 +44,16 @@ Si te han pasado este repo solo para instalar la app, haz esto:
 4. Abre `memoub`
 5. Entra con Google
 
+## Descarga rapida Windows
+
+Si te han pasado este repo solo para instalar la app de escritorio, haz esto:
+
+1. Pulsa el boton grande de Windows de arriba
+2. En la release mas reciente, descarga `memoub_X.Y.Z_x64-setup.exe`
+3. Ejecuta el instalador
+4. Abre `memoub`
+5. Entra con Google la primera vez
+
 ## Estado actual
 
 - Login con Google funcionando en local y en produccion
@@ -51,8 +67,8 @@ Si te han pasado este repo solo para instalar la app, haz esto:
 - Flujo validado entre Android y Windows
 - App Android nativa empaquetada con Capacitor y validada en dispositivo real
 - APK release firmada validada para distribucion manual fuera de Google Play
-- App Windows nativa empaquetada con Tauri funcionando en local
-- Shell Windows con tray, cierre a tray, arranque con Windows y preview de la nota implementados
+- App Windows nativa empaquetada con Tauri validada ya como instalador real
+- Shell Windows con tray, cierre a tray, arranque con Windows, preview y sesion persistida implementados
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
@@ -86,11 +102,16 @@ Detalle tecnico:
 ## Version Windows
 
 - Base tecnica fijada: Tauri
-- Shell Windows nativa ya arrancando en local
+- Shell Windows nativa ya validada como app instalada
 - Ventana principal con tamano inicial de escritorio y comportamiento nativo
 - Tray residente con reapertura rapida, cierre a tray y preview de la nota
 - Arranque con Windows configurable desde el menu del tray
+- Distribucion actual por instalador `.exe` en GitHub Releases
 - Direccion UX: [Spec Windows](docs/windows-ux.md)
+
+Detalle tecnico:
+
+- [Flujo manual de release Windows](docs/windows-release.md)
 
 ## Stack
 
@@ -136,3 +157,4 @@ Detalle tecnico:
 - [UX Windows](docs/windows-ux.md)
 - [Sistema de temas](docs/theme-system.md)
 - [Release Android manual](docs/android-release.md)
+- [Release Windows manual](docs/windows-release.md)

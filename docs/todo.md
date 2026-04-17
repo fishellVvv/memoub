@@ -21,6 +21,9 @@
 - Cierre a tray y reapertura desde tray implementados
 - Opcion de iniciar con Windows implementada desde el menu del tray
 - Preview de la nota en el tray implementada y ajustada visualmente
+- Instalador Windows `.exe` validado fuera de `tauri:dev`
+- Persistencia de sesion y preview del tray validadas en la app Windows instalada
+- Flujo manual de release Windows documentado
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -42,11 +45,10 @@
 - Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
 - Empaquetar y validar la app Windows fuera del entorno de desarrollo
+- Preparar la primera release publica Windows en GitHub
 
 ## Pendiente funcional
 
-- Validar instalacion y distribucion real de la app Windows
-- Definir flujo de release Windows equivalente al de Android
 - Revisar si la preview del tray necesita una iteracion final de usabilidad
 - Decidir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`

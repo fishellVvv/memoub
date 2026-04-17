@@ -7,6 +7,7 @@
 - **Android nativo**: Capacitor + Android Studio
 - **Windows nativo**: Tauri
 - **Distribucion Android actual**: APK release firmada para reparto manual
+- **Distribucion Windows actual**: instalador `.exe` release firmado por Tauri y repartido manualmente
 - **Backend**: Supabase
 - **Auth web**: Google OAuth con Supabase Auth
 - **Auth Android**: Google Sign-In nativo + `signInWithIdToken` de Supabase
@@ -19,7 +20,7 @@
 
 - Una sola base web compartida entre **Android** y **Windows**
 - Una app Android nativa empaquetada a partir de la misma base web
-- Una futura app Windows nativa empaquetada con Tauri
+- Una app Windows nativa empaquetada con Tauri
 - Una sola nota por usuario
 - Texto plano, sin rich text
 - Autosave con debounce
@@ -43,6 +44,8 @@
 - La shell Windows ya abre como ventana nativa y usa tray residente
 - El cierre a tray, la reapertura desde tray y el autostart ya estan implementados
 - La preview de la nota desde el tray ya esta implementada con tema y texto sincronizados
+- El instalador Windows real ya se ha generado y validado fuera de `tauri:dev`
+- La sesion desktop y la preview del tray ya funcionan tambien en la app instalada
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

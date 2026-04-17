@@ -28,6 +28,7 @@ Estado actual de esta linea:
 - arranque con Windows configurable desde el menu del tray
 - ventana principal con comportamiento nativo ya operativa
 - preview de la nota sobre el tray ya implementada
+- instalador Windows real ya validado fuera de `tauri:dev`
 
 ## Comportamiento del icono
 
@@ -56,6 +57,7 @@ Estado actual:
 
 - la preview ya se resuelve como una mini ventana nativa asociada al tray
 - ya sigue el tema activo y muestra texto + linea final de sincronizacion
+- ya muestra el estado real de la nota y de la sesion en la app instalada
 - sigue siendo una zona razonable para pulido fino de UX si hiciera falta
 
 ## Ventana principal
@@ -80,6 +82,7 @@ Estado actual:
 - el tamano inicial actual es de escritorio ligero
 - se puede mover, redimensionar, minimizar y maximizar
 - al cerrar, vuelve a tray en lugar de cerrar la app entera
+- la sesion ya se recuerda correctamente al volver a abrir la app instalada
 
 ## Relacion con Android
 
@@ -103,5 +106,5 @@ La base tecnica fijada para esta fase es:
 ## Consecuencias para roadmap
 
 - Primero: usar Tauri como base nativa de Windows
-- Despues: seguir puliendo la shell ya implementada y preparar distribucion real
+- Despues: seguir puliendo la shell ya implementada y mantener el flujo real de distribucion Windows
 - Si se quiere cumplir esta UX completa, la via fijada es empaquetado nativo
