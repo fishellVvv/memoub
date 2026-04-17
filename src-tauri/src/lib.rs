@@ -6,6 +6,7 @@ use tauri::{
   WebviewWindowBuilder, WindowEvent,
 };
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+use tauri_plugin_deep_link::DeepLinkExt;
 
 const AUTOSTART_ARG: &str = "--autostart";
 const MAIN_WINDOW_LABEL: &str = "main";
@@ -270,6 +271,8 @@ pub fn run() {
   }
 
   builder = builder
+    .plugin(tauri_plugin_deep_link::init())
+    .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_store::Builder::new().build())
     .plugin(tauri_plugin_autostart::init(
       MacosLauncher::LaunchAgent,
@@ -292,6 +295,9 @@ pub fn run() {
       get_preview_snapshot
     ])
     .setup(|app| {
+      #[cfg(any(windows, target_os = "linux"))]
+      app.deep_link().register_all()?;
+
       if let Ok(enabled) = app.autolaunch().is_enabled() {
         if !enabled {
           let _ = app.autolaunch().enable();

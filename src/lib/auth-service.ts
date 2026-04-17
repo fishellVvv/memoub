@@ -1,8 +1,13 @@
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { Capacitor } from "@capacitor/core";
 import { SocialLogin } from "@capgo/capacitor-social-login";
+import {
+  getDesktopAuthRedirectUrl,
+  openDesktopOAuthUrl,
+} from "./desktop-auth";
 import { getSupabaseClient } from "./supabase";
 import { appConfig } from "./config";
+import { isTauriDesktop } from "./desktop";
 
 let nativeGoogleInitialization: Promise<void> | null = null;
 
@@ -29,6 +34,11 @@ export class AuthService {
 
     if (this.isAndroidNativePlatform()) {
       await this.signInWithNativeGoogle(client);
+      return;
+    }
+
+    if (this.isDesktopPlatform()) {
+      await this.signInWithDesktopGoogle(client);
       return;
     }
 
@@ -81,8 +91,28 @@ export class AuthService {
     return session?.user ?? null;
   }
 
+  async completeDesktopAuthCode(code: string): Promise<void> {
+    if (!this.isDesktopPlatform()) {
+      return;
+    }
+
+    const client = getSupabaseClient();
+    if (!client) {
+      throw new Error("Supabase no esta configurado.");
+    }
+
+    const { error } = await client.auth.exchangeCodeForSession(code);
+    if (error) {
+      throw error;
+    }
+  }
+
   private isAndroidNativePlatform(): boolean {
     return Capacitor.getPlatform() === "android";
+  }
+
+  private isDesktopPlatform(): boolean {
+    return isTauriDesktop();
   }
 
   private async ensureNativeGoogleInitialized(): Promise<void> {
@@ -123,5 +153,25 @@ export class AuthService {
     if (error) {
       throw error;
     }
+  }
+
+  private async signInWithDesktopGoogle(client: NonNullable<ReturnType<typeof getSupabaseClient>>): Promise<void> {
+    const { data, error } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: getDesktopAuthRedirectUrl(),
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data.url) {
+      throw new Error("Supabase no devolvio la URL de autenticacion de Google.");
+    }
+
+    await openDesktopOAuthUrl(data.url);
   }
 }

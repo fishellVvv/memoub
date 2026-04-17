@@ -2,6 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { AuthService } from "../lib/auth-service";
 import { appConfig } from "../lib/config";
+import {
+  getDesktopOAuthCallback,
+  type DesktopAuthCallback,
+  listenToDesktopOAuthCallbacks,
+} from "../lib/desktop-auth";
 import { NoteRepository } from "../lib/note-repository";
 import { createDebouncedTask, createEmptyNote, SyncEngine } from "../lib/sync-engine";
 import type { Note, SyncState } from "../lib/types";
@@ -38,9 +43,54 @@ export function useMemoubApp() {
     }
 
     let active = true;
+    let removeDesktopAuthListener = () => {};
+
+    const handleDesktopAuthCallback = async (
+      callback: DesktopAuthCallback | null,
+    ) => {
+      if (!callback || !active) {
+        return;
+      }
+
+      if (callback.kind === "error") {
+        setAuthState("anonymous");
+        setSyncState({
+          ...DEFAULT_SYNC_STATE,
+          status: "error",
+          message: callback.errorDescription
+            ? `Google devolvio un error: ${callback.errorDescription}`
+            : `Google devolvio un error: ${callback.error}`,
+        });
+        return;
+      }
+
+      setAuthState("loading");
+
+      try {
+        await authService.completeDesktopAuthCode(callback.code);
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        setAuthState("anonymous");
+        setSyncState({
+          ...DEFAULT_SYNC_STATE,
+          status: "error",
+          message: error instanceof Error
+            ? error.message
+            : "No se pudo completar el login de Windows.",
+        });
+      }
+    };
 
     const bootstrap = async () => {
       try {
+        await handleDesktopAuthCallback(await getDesktopOAuthCallback());
+        if (!active) {
+          return;
+        }
+
         const session = await authService.getSession();
         if (!active) {
           return;
@@ -64,6 +114,11 @@ export function useMemoubApp() {
     };
 
     void bootstrap();
+    void listenToDesktopOAuthCallbacks(async (callback) => {
+      await handleDesktopAuthCallback(callback);
+    }).then((unlisten) => {
+      removeDesktopAuthListener = unlisten;
+    });
 
     const unsubscribe = authService.onAuthStateChange((_event, session) => {
       const nextUser = authService.getUser(session);
@@ -78,6 +133,7 @@ export function useMemoubApp() {
 
     return () => {
       active = false;
+      removeDesktopAuthListener();
       unsubscribe();
     };
   }, [authService]);

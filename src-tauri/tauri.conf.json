@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "memoub",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "identifier": "com.fishellvvv.memoub",
   "build": {
     "frontendDist": "../dist",
@@ -35,5 +35,12 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["com.fishellvvv.memoub"]
+      }
+    }
   }
 }

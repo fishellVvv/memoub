@@ -1,6 +1,6 @@
 [package]
 name = "memoub"
-version = "1.0.2"
+version = "1.0.3"
 description = "memoub Windows desktop app built with Tauri"
 authors = ["FishellVvv"]
 license = ""
@@ -24,5 +24,7 @@ log = "0.4"
 tauri = { version = "2.10.3", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-autostart = "2.5.1"
-tauri-plugin-single-instance = "2"
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-store = "2"
+tauri-plugin-deep-link = "2"
+tauri-plugin-opener = "2"

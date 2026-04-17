@@ -11,13 +11,22 @@ export function getSupabaseClient(): SupabaseClient | null {
   }
 
   if (!client) {
+    const authOptions = isTauriDesktop()
+      ? {
+          storage: desktopAuthStorage,
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+          flowType: "pkce" as const,
+        }
+      : {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        };
+
     client = createClient(appConfig.supabaseUrl, appConfig.supabaseAnonKey, {
-      auth: {
-        storage: isTauriDesktop() ? desktopAuthStorage : undefined,
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
+      auth: authOptions
     });
   }
 
