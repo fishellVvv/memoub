@@ -1,17 +1,17 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "memoub"
+version = "1.0.2"
+description = "memoub Windows desktop app built with Tauri"
+authors = ["FishellVvv"]
 license = ""
-repository = ""
+repository = "https://github.com/fishellVvv/memoub"
 edition = "2021"
 rust-version = "1.77.2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "app_lib"
+name = "memoub_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -24,3 +24,5 @@ log = "0.4"
 tauri = { version = "2.10.3", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-autostart = "2.5.1"
+tauri-plugin-single-instance = "2"
+tauri-plugin-store = "2"

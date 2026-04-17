@@ -1,7 +1,7 @@
 {
   "name": "memoub",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,6 +26,7 @@
     "@fontsource/ibm-plex-serif": "^5.2.7",
     "@supabase/supabase-js": "^2.50.0",
     "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-store": "^2.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

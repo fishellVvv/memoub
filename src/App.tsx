@@ -1,16 +1,16 @@
 import {
   useEffect,
-  useLayoutEffect,
   useMemo,
-  useRef,
   useState,
   type CSSProperties,
 } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { useMemoubApp } from "./hooks/useMemoubApp";
 import { useLocale } from "./hooks/useLocale";
 import { useTheme } from "./hooks/useTheme";
 import { useUiScale } from "./hooks/useUiScale";
+import type { DesktopPreviewSnapshot } from "./lib/desktop";
+import { isTauriDesktop } from "./lib/desktop";
+import { pushDesktopPreviewSnapshot } from "./lib/desktop-preview";
 import type { Locale, LocaleMessages } from "./lib/i18n";
 import {
   resolveThemeBase,
@@ -120,9 +120,9 @@ function formatDate(
   }).format(new Date(value));
 }
 
-function formatFooterDate(value: string | null): string {
+function formatFooterDate(value: string | null, copy?: LocaleMessages): string {
   if (!value) {
-    return "---- -- -- | --:--:-- |";
+    return copy?.noSyncYet ?? "Aun sin sincronizar";
   }
 
   const date = new Date(value);
@@ -133,7 +133,7 @@ function formatFooterDate(value: string | null): string {
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
-  return `${year}-${month}-${day} | ${hours}:${minutes}:${seconds} |`;
+  return `${year}-${month}-${day} | ${hours}:${minutes}:${seconds}`;
 }
 
 function previewContent(content: string): string {
@@ -188,9 +188,6 @@ function normalizeFooterMessage(
 }
 
 function App() {
-  const isTrayPreview =
-    typeof window !== "undefined" && window.location.hash === "#tray-preview";
-  const trayPreviewRef = useRef<HTMLElement | null>(null);
   const { locale, setLocale, messages: copy } = useLocale();
   const {
     presetThemes,
@@ -264,13 +261,6 @@ function App() {
   }, [noteContent]);
 
   useEffect(() => {
-    document.body.classList.toggle("tray-preview-mode", isTrayPreview);
-    return () => {
-      document.body.classList.remove("tray-preview-mode");
-    };
-  }, [isTrayPreview]);
-
-  useEffect(() => {
     if (authState !== "authenticated") {
       setMenuOpen(false);
       setThemeSelectorOpen(false);
@@ -279,85 +269,40 @@ function App() {
     }
   }, [authState]);
 
-  const trayPreviewMessage = !isConfigured
-    ? copy.configTitle
-    : authState !== "authenticated"
-      ? copy.authTitle
-      : noteContent.trim() || copy.noText;
-
-  useLayoutEffect(() => {
-    if (!isTrayPreview || !trayPreviewRef.current) {
+  useEffect(() => {
+    if (!isTauriDesktop()) {
       return;
     }
 
-    const previewElement = trayPreviewRef.current;
-    let frame = 0;
-
-    const syncPreviewWindow = () => {
-      const rect = previewElement.getBoundingClientRect();
-      const height = Math.ceil(rect.height) * 1.25;
-
-      void invoke("sync_preview_window", { height });
+    const hasPreviewContent = isConfigured && authState === "authenticated";
+    const nextSnapshot: DesktopPreviewSnapshot = {
+      message: hasPreviewContent ? noteContent.trim() || copy.noText : "",
+      footerLine: hasPreviewContent
+        ? `${formatFooterDate(syncState.lastSyncedAt, copy)} | ${footerDetail}`
+        : "",
+      status: hasPreviewContent ? syncState.status : "idle",
+      theme: {
+        background: resolvedThemeTokens["note-surface"],
+        text: resolvedThemeTokens["app-text"],
+        mutedText: resolvedThemeTokens["app-text-muted"],
+        fontFamily: resolvedThemeTokens["theme-font-family"],
+        uiScale,
+      },
     };
 
-    const scheduleSync = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(syncPreviewWindow);
-    };
-
-    const resizeObserver = new ResizeObserver(() => {
-      scheduleSync();
-    });
-
-    resizeObserver.observe(previewElement);
-    scheduleSync();
-
-    if ("fonts" in document) {
-      void document.fonts.ready.then(() => {
-        scheduleSync();
-      });
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-      window.cancelAnimationFrame(frame);
-    };
+    void pushDesktopPreviewSnapshot(nextSnapshot);
   }, [
-    isTrayPreview,
-    trayPreviewMessage,
+    authState,
+    copy.noText,
+    copy.noSyncYet,
+    footerDetail,
+    isConfigured,
+    noteContent,
+    resolvedThemeTokens,
+    syncState.lastSyncedAt,
+    syncState.status,
     uiScale,
-    resolvedThemeTokens["theme-font-family"],
-    resolvedThemeTokens["app-text"],
-    resolvedThemeTokens["note-surface"],
   ]);
-
-  if (isTrayPreview) {
-    const trayPreviewStyle = {
-      background: resolvedThemeTokens["note-surface"],
-      color: resolvedThemeTokens["app-text"],
-      fontFamily: resolvedThemeTokens["theme-font-family"],
-    } as CSSProperties;
-    const trayPreviewFooterLine = `${formatFooterDate(syncState.lastSyncedAt)} ${footerDetail}`;
-
-    return (
-      <main
-        ref={trayPreviewRef}
-        className="tray-preview-screen"
-        style={trayPreviewStyle}
-      >
-        <p className="tray-preview-message">{trayPreviewMessage}</p>
-        <div className="tray-preview-footer">
-          <span
-            className={`tray-preview-status-orb tray-preview-status-orb-${syncState.status}`}
-            aria-hidden="true"
-          />
-          <span className="tray-preview-footer-line">
-            {trayPreviewFooterLine}
-          </span>
-        </div>
-      </main>
-    );
-  }
 
   const applyCustomPreference = (
     overrides: ThemeOverrides,
@@ -1013,7 +958,7 @@ function App() {
           <div className="footer-copy">
             <div className="footer-inline">
               <span className="footer-secondary">
-                {formatFooterDate(syncState.lastSyncedAt)}
+                {formatFooterDate(syncState.lastSyncedAt, copy)}
               </span>
               <span className="footer-tertiary">{footerDetail}</span>
             </div>

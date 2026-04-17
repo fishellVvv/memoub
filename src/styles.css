@@ -237,8 +237,7 @@ code {
   width: 320px;
   padding: 0.45rem 88px 0.45rem 0.55rem;
   overflow: hidden;
-  background: var(--note-surface);
-  color: var(--app-text);
+  font-family: var(--tray-preview-font-family, inherit);
   pointer-events: none;
 }
 
@@ -246,7 +245,7 @@ code {
   margin: 0;
   width: 100%;
   color: inherit;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--tray-preview-font-scale, 1));
   line-height: 1.35;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -258,8 +257,8 @@ code {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  color: var(--app-text-muted);
-  font-size: 0.72rem;
+  color: var(--tray-preview-muted-text, currentColor);
+  font-size: calc(0.72rem * var(--tray-preview-font-scale, 1));
   line-height: 1.2;
 }
 

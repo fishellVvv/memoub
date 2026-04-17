@@ -1,9 +1,9 @@
+use std::{path::PathBuf, sync::Mutex};
 use tauri::{
   menu::{CheckMenuItemBuilder, MenuBuilder, MenuItemBuilder},
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-  AppHandle, LogicalPosition, LogicalSize, Manager, Position, Size, WebviewUrl,
-  WebviewWindowBuilder,
-  WindowEvent,
+  AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, Position, Size, WebviewUrl,
+  WebviewWindowBuilder, WindowEvent,
 };
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
@@ -14,10 +14,33 @@ const TRAY_ID: &str = "main-tray";
 const TRAY_OPEN_ID: &str = "tray-open";
 const TRAY_AUTOSTART_ID: &str = "tray-autostart";
 const TRAY_QUIT_ID: &str = "tray-quit";
+const PREVIEW_SNAPSHOT_EVENT: &str = "desktop://preview-snapshot";
 const PREVIEW_WINDOW_WIDTH: f64 = 320.0;
 const PREVIEW_MIN_HEIGHT: f64 = 28.0;
 const PREVIEW_MARGIN_X: f64 = 8.0;
 const PREVIEW_MARGIN_Y: f64 = 4.0;
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PreviewThemeSnapshot {
+  background: String,
+  text: String,
+  muted_text: String,
+  font_family: String,
+  ui_scale: f64,
+}
+
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PreviewSnapshot {
+  message: String,
+  footer_line: String,
+  status: String,
+  theme: PreviewThemeSnapshot,
+}
+
+#[derive(Default)]
+struct PreviewSnapshotStore(Mutex<PreviewSnapshot>);
 
 fn is_autostart_launch() -> bool {
   std::env::args().any(|arg| arg == AUTOSTART_ARG)
@@ -43,6 +66,21 @@ fn hide_preview_window<R: tauri::Runtime>(app: &AppHandle<R>) {
   if let Some(window) = app.get_webview_window(PREVIEW_WINDOW_LABEL) {
     let _ = window.hide();
   }
+}
+
+fn read_preview_snapshot<R: tauri::Runtime>(app: &AppHandle<R>) -> PreviewSnapshot {
+  match app.state::<PreviewSnapshotStore>().0.lock() {
+    Ok(value) => value.clone(),
+    Err(_) => PreviewSnapshot::default(),
+  }
+}
+
+fn has_preview_content(snapshot: &PreviewSnapshot) -> bool {
+  !snapshot.message.trim().is_empty() || !snapshot.footer_line.trim().is_empty()
+}
+
+fn emit_preview_snapshot<R: tauri::Runtime>(app: &AppHandle<R>, snapshot: &PreviewSnapshot) {
+  let _ = app.emit_to(PREVIEW_WINDOW_LABEL, PREVIEW_SNAPSHOT_EVENT, snapshot);
 }
 
 fn preview_window_height<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) -> f64 {
@@ -81,8 +119,23 @@ fn preview_window_position<R: tauri::Runtime>(app: &AppHandle<R>, preview_height
   }
 }
 
+fn preview_data_directory<R: tauri::Runtime>(app: &AppHandle<R>) -> Option<PathBuf> {
+  app
+    .path()
+    .app_local_data_dir()
+    .ok()
+    .map(|path| path.join("tray-preview-webview-desktop"))
+}
+
 fn show_preview_window<R: tauri::Runtime>(app: &AppHandle<R>) {
+  let snapshot = read_preview_snapshot(app);
+  if !has_preview_content(&snapshot) {
+    hide_preview_window(app);
+    return;
+  }
+
   if let Some(window) = app.get_webview_window(PREVIEW_WINDOW_LABEL) {
+    emit_preview_snapshot(app, &snapshot);
     let preview_height = preview_window_height(&window);
     let (x, y) = preview_window_position(app, preview_height);
 
@@ -112,8 +165,13 @@ fn build_preview_window<R: tauri::Runtime>(app: &AppHandle<R>) -> tauri::Result<
   .closable(false)
   .focusable(false)
   .transparent(true)
-  .inner_size(PREVIEW_WINDOW_WIDTH, 48.0)
-  .build()?;
+  .inner_size(PREVIEW_WINDOW_WIDTH, 48.0);
+
+  let preview_window = if let Some(data_directory) = preview_data_directory(app) {
+    preview_window.data_directory(data_directory).build()?
+  } else {
+    preview_window.build()?
+  };
 
   let _ = preview_window.set_ignore_cursor_events(true);
 
@@ -202,20 +260,38 @@ fn wire_main_window_behavior<R: tauri::Runtime>(app: &AppHandle<R>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![sync_preview_window])
+  let mut builder = tauri::Builder::default();
+
+  #[cfg(desktop)]
+  {
+    builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+      show_main_window(app);
+    }));
+  }
+
+  builder = builder
+    .plugin(tauri_plugin_store::Builder::new().build())
+    .plugin(tauri_plugin_autostart::init(
+      MacosLauncher::LaunchAgent,
+      Some(vec![AUTOSTART_ARG]),
+    ));
+
+  if cfg!(debug_assertions) {
+    builder = builder.plugin(
+      tauri_plugin_log::Builder::default()
+        .level(log::LevelFilter::Info)
+        .build(),
+    );
+  }
+
+  builder
+    .manage(PreviewSnapshotStore::default())
+    .invoke_handler(tauri::generate_handler![
+      sync_preview_window,
+      update_preview_snapshot,
+      get_preview_snapshot
+    ])
     .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-
-      app.handle()
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![AUTOSTART_ARG])))?;
-
       if let Ok(enabled) = app.autolaunch().is_enabled() {
         if !enabled {
           let _ = app.autolaunch().enable();
@@ -245,5 +321,28 @@ fn sync_preview_window(app: AppHandle, height: f64) {
     let (x, y) = preview_window_position(&app, next_height);
 
     let _ = window.set_position(Position::Logical(LogicalPosition::new(x, y)));
+  }
+}
+
+#[tauri::command]
+fn update_preview_snapshot(
+  app: AppHandle,
+  store: tauri::State<PreviewSnapshotStore>,
+  snapshot: PreviewSnapshot,
+) {
+  if let Ok(mut value) = store.0.lock() {
+    *value = snapshot.clone();
+  }
+
+  emit_preview_snapshot(&app, &snapshot);
+}
+
+#[tauri::command]
+fn get_preview_snapshot(
+  store: tauri::State<PreviewSnapshotStore>,
+) -> PreviewSnapshot {
+  match store.0.lock() {
+    Ok(value) => value.clone(),
+    Err(_) => PreviewSnapshot::default(),
   }
 }
