@@ -31,7 +31,7 @@ Eso incluye:
 - tema activo explícito, si existe
 - configuración completa del tema `Custom`
 
-En futuras apps empaquetadas para Android y Windows se mantendrá esta misma regla: persistencia local por dispositivo.
+En las apps empaquetadas de Android y Windows se mantiene esta misma regla: persistencia local por dispositivo.
 
 ## Tokens base
 Cada tema declara solo estos 8 valores:

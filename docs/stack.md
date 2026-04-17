@@ -46,6 +46,7 @@
 - La preview de la nota desde el tray ya esta implementada con tema y texto sincronizados
 - El instalador Windows real ya se ha generado y validado fuera de `tauri:dev`
 - La sesion desktop y la preview del tray ya funcionan tambien en la app instalada
+- La release publica de Windows ya vive en GitHub Releases
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

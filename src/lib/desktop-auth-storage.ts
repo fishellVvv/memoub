@@ -18,7 +18,6 @@ async function getDesktopAuthStore() {
   if (!storePromise) {
     storePromise = load(AUTH_STORE_PATH, {
       defaults: {},
-      autoSave: 100,
     });
   }
 

@@ -113,4 +113,4 @@ memoub_X.Y.Z_x64-setup.exe
 - sesion recordada
 - tray preview correcta
 - release subida a GitHub
-- README sigue apuntando a `releases/latest`
+- README apunta al asset correcto de Windows para la version publica vigente

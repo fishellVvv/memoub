@@ -1,10 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import type { UnlistenFn } from "@tauri-apps/api/event";
 import type { DesktopPreviewSnapshot } from "./lib/desktop";
 import {
   listenToDesktopPreviewSnapshot,
   readDesktopPreviewSnapshot,
   syncDesktopPreviewWindow,
 } from "./lib/desktop-preview";
+
+const PREVIEW_HEIGHT_MULTIPLIER = 1.25;
 
 function TrayPreviewApp() {
   const previewRef = useRef<HTMLElement | null>(null);
@@ -58,7 +61,7 @@ function TrayPreviewApp() {
 
     const syncPreviewWindow = () => {
       const rect = previewElement.getBoundingClientRect();
-      const height = Math.ceil(rect.height) * 1.25;
+      const height = Math.ceil(rect.height) * PREVIEW_HEIGHT_MULTIPLIER;
 
       void syncDesktopPreviewWindow(height);
     };
@@ -108,7 +111,5 @@ function TrayPreviewApp() {
     </main>
   );
 }
-
-type UnlistenFn = () => void;
 
 export default TrayPreviewApp;

@@ -3,7 +3,7 @@
 ## Objetivo
 
 Definir la experiencia principal de `memoub` tomando **Android como referencia**.  
-La version de Windows se adaptara despues a esta logica de uso, no al reves.
+La version de Windows ya existe como companion de escritorio, pero sigue esta logica de uso, no al reves.
 
 ## Principios
 

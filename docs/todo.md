@@ -15,7 +15,7 @@
 - APK release firmada validada para distribucion manual fuera de Google Play
 - Flujo manual de build Android release documentado
 - Arquitectura Windows fijada en Tauri
-- Base Tauri inicializada para la futura app Windows
+- Base Tauri inicializada
 - Shell Windows nativa funcionando con Tauri
 - Ventana Windows con tamano inicial de escritorio implementada
 - Cierre a tray y reapertura desde tray implementados
@@ -24,6 +24,7 @@
 - Instalador Windows `.exe` validado fuera de `tauri:dev`
 - Persistencia de sesion y preview del tray validadas en la app Windows instalada
 - Flujo manual de release Windows documentado
+- Release publica Windows subida a GitHub
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -44,8 +45,7 @@
 - Refinar la UX del selector de temas y del editor `Custom`
 - Refinar la UX del selector de idioma
 - Mejorar UX de estados y mensajes de sincronizacion
-- Empaquetar y validar la app Windows fuera del entorno de desarrollo
-- Preparar la primera release publica Windows en GitHub
+- Seguir puliendo la experiencia desktop una vez cerrada la base de Windows
 
 ## Pendiente funcional
 
@@ -62,5 +62,5 @@
 - Vigilar si el bundle de fuentes sigue necesitando mas recorte en el futuro
 - Revisar las vulnerabilidades reportadas por `npm install`
 - Añadir tests de integracion del flujo con Supabase
-- Añadir pruebas manuales documentadas para instalacion PWA en Windows y Android
+- Añadir pruebas manuales documentadas para instalacion Android y Windows
 - Mantener fuera del repo publico cualquier clave secreta, client secret o configuracion sensible

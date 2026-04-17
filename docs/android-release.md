@@ -126,5 +126,5 @@ Nota:
 Ventaja:
 
 - el historial queda claro para ti
-- quien llegue al repo puede usar siempre la pagina de `latest release`
-- no hace falta mantener enlaces duros a una version concreta dentro del README
+- Android mantiene su propia linea de releases separada de Windows
+- el README puede apuntar al asset correcto de Android sin depender de `latest`

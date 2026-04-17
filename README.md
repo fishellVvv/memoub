@@ -120,7 +120,7 @@ Detalle tecnico:
 - IndexedDB para cache local y soporte offline basico
 - `vite-plugin-pwa` para instalacion y cache de la shell
 - Capacitor para empaquetado Android nativo
-- Tauri para la futura app Windows nativa
+- Tauri para la app Windows nativa
 - Sistema de temas local con presets, modo sistema y `Custom`
 - Localizacion ligera con selector manual y fallback al idioma del sistema
 - Fuentes libres autoalojadas con subsets `latin` y `latin-ext`

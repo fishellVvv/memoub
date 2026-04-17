@@ -32,7 +32,7 @@ export class AuthService {
       return;
     }
 
-    const { data, error } = await client.auth.signInWithOAuth({
+    const { error } = await client.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: window.location.origin

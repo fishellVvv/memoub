@@ -29,6 +29,7 @@ Estado actual de esta linea:
 - ventana principal con comportamiento nativo ya operativa
 - preview de la nota sobre el tray ya implementada
 - instalador Windows real ya validado fuera de `tauri:dev`
+- release publica Windows ya disponible en GitHub Releases
 
 ## Comportamiento del icono
 
