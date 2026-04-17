@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/fishellVvv/memoub/releases/download/windows-v1.0.2/memoub_1.0.2_x64-setup.exe">
-    <img alt="Descargar ultima version Windows" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white">
+    <img alt="Descargar ultima version Windows" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Windows-0078d4?style=for-the-badge&logo=windows&logoColor=white">
   </a>
 </p>
 
