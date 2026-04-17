@@ -45,6 +45,7 @@ export type LocaleMessages = {
   languageSelectorLabel: string;
   systemTheme: string;
   customTheme: string;
+  textSize: string;
   customNote: string;
   customPreviewCopy: string;
   saveChanges: string;
@@ -125,6 +126,7 @@ const messages: Record<Locale, LocaleMessages> = {
     languageSelectorLabel: "Selector de idioma",
     systemTheme: "Tema de sistema",
     customTheme: "Custom",
+    textSize: "Tamaño del texto",
     customNote: "nota custom",
     customPreviewCopy: "ajusta colores y fuente hasta dar con tu tono.",
     saveChanges: "Guardar cambios",
@@ -203,6 +205,7 @@ const messages: Record<Locale, LocaleMessages> = {
     languageSelectorLabel: "Language selector",
     systemTheme: "System theme",
     customTheme: "Custom",
+    textSize: "Text size",
     customNote: "custom note",
     customPreviewCopy: "adjust colors and type until it feels right.",
     saveChanges: "Save changes",

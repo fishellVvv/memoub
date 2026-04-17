@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import {
+  CUSTOM_THEME_STORAGE_KEY,
   DEFAULT_CUSTOM_THEME_PREFERENCE,
   DEFAULT_THEME_PREFERENCE,
+  THEME_STORAGE_KEY,
   applyThemeTokens,
   listPresetThemes,
   readStoredCustomTheme,
   readSystemColorScheme,
   readStoredTheme,
+  resolveThemeBase,
   resolveThemePreference,
   resolveThemeMode,
   resolveThemeTokens,
@@ -65,6 +68,25 @@ export function useTheme() {
     writeStoredCustomTheme(customThemePreference);
   }, [customThemePreference]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === THEME_STORAGE_KEY) {
+        setThemePreference(readStoredTheme() ?? DEFAULT_THEME_PREFERENCE);
+      }
+
+      if (event.key === CUSTOM_THEME_STORAGE_KEY) {
+        setCustomThemePreference(readStoredCustomTheme() ?? DEFAULT_CUSTOM_THEME_PREFERENCE);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   const setPresetTheme = (themeId: ThemeId) => {
     setThemePreference({
       kind: "preset",
@@ -97,6 +119,7 @@ export function useTheme() {
     themePreference.kind === "preset" ? themePreference.themeId : themePreference.kind === "custom" ? themePreference.baseThemeId : null;
   const customThemeActive = themePreference.kind === "custom";
   const systemThemeActive = themePreference.kind === "system";
+  const resolvedThemeTokens = resolveThemeTokens(themePreference, systemColorScheme);
 
   return {
     themePreference,
@@ -105,6 +128,7 @@ export function useTheme() {
     customThemeActive,
     systemThemeActive,
     systemColorScheme,
+    resolvedThemeTokens,
     presetThemes: listPresetThemes(),
     setSystemTheme,
     setPresetTheme,

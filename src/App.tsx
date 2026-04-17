@@ -1,9 +1,24 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useMemoubApp } from "./hooks/useMemoubApp";
 import { useLocale } from "./hooks/useLocale";
 import { useTheme } from "./hooks/useTheme";
+import { useUiScale } from "./hooks/useUiScale";
 import type { Locale, LocaleMessages } from "./lib/i18n";
-import { resolveThemeBase, resolveThemeTokens, type ThemeId, type ThemeOverrides, type ThemePreference } from "./lib/theme";
+import {
+  resolveThemeBase,
+  resolveThemeTokens,
+  type ThemeId,
+  type ThemeOverrides,
+  type ThemePreference,
+} from "./lib/theme";
 import type { SyncState } from "./lib/types";
 
 const CUSTOM_COLOR_FIELDS = [
@@ -14,45 +29,45 @@ const CUSTOM_COLOR_FIELDS = [
   { key: "muted" },
   { key: "accent" },
   { key: "success" },
-  { key: "danger" }
+  { key: "danger" },
 ] as const;
 
 const FONT_FAMILY_OPTIONS = [
   {
     id: "sourceSerif4",
-    value: "\"Source Serif 4 Variable\", Georgia, serif"
+    value: '"Source Serif 4 Variable", Georgia, serif',
   },
   {
     id: "ibmPlexSerif",
-    value: "\"IBM Plex Serif\", Georgia, serif"
+    value: '"IBM Plex Serif", Georgia, serif',
   },
   {
     id: "sourceSans3",
-    value: "\"Source Sans 3 Variable\", sans-serif"
+    value: '"Source Sans 3 Variable", sans-serif',
   },
   {
     id: "ibmPlexSans",
-    value: "\"IBM Plex Sans Variable\", sans-serif"
+    value: '"IBM Plex Sans Variable", sans-serif',
   },
   {
     id: "atkinsonHyperlegible",
-    value: "\"Atkinson Hyperlegible\", sans-serif"
+    value: '"Atkinson Hyperlegible", sans-serif',
   },
   {
     id: "ibmPlexMono",
-    value: "\"IBM Plex Mono\", monospace"
+    value: '"IBM Plex Mono", monospace',
   },
   {
     id: "jetbrainsMono",
-    value: "\"JetBrains Mono Variable\", monospace"
-  }
+    value: '"JetBrains Mono Variable", monospace',
+  },
 ] as const;
 
 const THEME_NAME_MAP: Record<ThemeId, string> = {
   paper: "Paper",
   sea: "Sea",
   graphite: "Graphite",
-  matrix: "Matrix"
+  matrix: "Matrix",
 };
 
 type CustomColorKey = (typeof CUSTOM_COLOR_FIELDS)[number]["key"];
@@ -64,7 +79,7 @@ function formatThemeLabel(
     | { kind: "system" }
     | { kind: "custom" }
     | { kind: "preset"; id: ThemeId; colorScheme: "light" | "dark" },
-  copy: LocaleMessages
+  copy: LocaleMessages,
 ): string {
   if (theme.kind === "system") {
     return copy.systemTheme;
@@ -90,14 +105,18 @@ function normalizeHex(color: string): string {
   return `#${sanitized.slice(0, 6)}`;
 }
 
-function formatDate(value: string | null, locale: Locale, copy: LocaleMessages): string {
+function formatDate(
+  value: string | null,
+  locale: Locale,
+  copy: LocaleMessages,
+): string {
   if (!value) {
     return copy.noSyncYet;
   }
 
   return new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-US", {
     dateStyle: "short",
-    timeStyle: "short"
+    timeStyle: "short",
   }).format(new Date(value));
 }
 
@@ -130,7 +149,7 @@ function normalizeFooterMessage(
   status: SyncState["status"],
   message: string | null,
   hasPendingChanges: boolean,
-  copy: LocaleMessages
+  copy: LocaleMessages,
 ): string {
   switch (status) {
     case "loading":
@@ -169,9 +188,22 @@ function normalizeFooterMessage(
 }
 
 function App() {
+  const isTrayPreview =
+    typeof window !== "undefined" && window.location.hash === "#tray-preview";
+  const trayPreviewRef = useRef<HTMLElement | null>(null);
   const { locale, setLocale, messages: copy } = useLocale();
-  const { presetThemes, activeThemeId, customThemeActive, systemThemeActive, setSystemTheme, setPresetTheme, setCustomTheme, themePreference, customThemePreference } =
-    useTheme();
+  const {
+    presetThemes,
+    activeThemeId,
+    customThemeActive,
+    systemThemeActive,
+    setSystemTheme,
+    setPresetTheme,
+    setCustomTheme,
+    customThemePreference,
+    resolvedThemeTokens,
+  } = useTheme();
+  const { uiScale, setUiScale } = useUiScale();
 
   const {
     authState,
@@ -184,7 +216,7 @@ function App() {
     keepLocalConflictVersion,
     useRemoteConflictVersion,
     userEmail,
-    isConfigured
+    isConfigured,
   } = useMemoubApp();
   const [menuOpen, setMenuOpen] = useState(false);
   const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
@@ -210,13 +242,33 @@ function App() {
     }
   }, [copy, syncState.status]);
 
-  const footerDetail = normalizeFooterMessage(syncState.status, syncState.message, syncState.hasPendingChanges, copy);
-  const customThemeBase = useMemo(() => resolveThemeBase(customThemePreference), [customThemePreference]);
-  const customPreviewTokens = useMemo(() => resolveThemeTokens(customThemePreference), [customThemePreference]);
+  const footerDetail = normalizeFooterMessage(
+    syncState.status,
+    syncState.message,
+    syncState.hasPendingChanges,
+    copy,
+  );
+  const customThemeBase = useMemo(
+    () => resolveThemeBase(customThemePreference),
+    [customThemePreference],
+  );
+  const customPreviewTokens = useMemo(
+    () => resolveThemeTokens(customThemePreference),
+    [customThemePreference],
+  );
 
   useEffect(() => {
-    document.title = noteContent.trim() ? `${noteContent.trim().slice(0, 24)} - memoub` : "memoub";
+    document.title = noteContent.trim()
+      ? `${noteContent.trim().slice(0, 24)} - memoub`
+      : "memoub";
   }, [noteContent]);
+
+  useEffect(() => {
+    document.body.classList.toggle("tray-preview-mode", isTrayPreview);
+    return () => {
+      document.body.classList.remove("tray-preview-mode");
+    };
+  }, [isTrayPreview]);
 
   useEffect(() => {
     if (authState !== "authenticated") {
@@ -227,12 +279,98 @@ function App() {
     }
   }, [authState]);
 
-  const applyCustomPreference = (overrides: ThemeOverrides, baseThemeId: ThemeId = customThemePreference.baseThemeId) => {
+  const trayPreviewMessage = !isConfigured
+    ? copy.configTitle
+    : authState !== "authenticated"
+      ? copy.authTitle
+      : noteContent.trim() || copy.noText;
+
+  useLayoutEffect(() => {
+    if (!isTrayPreview || !trayPreviewRef.current) {
+      return;
+    }
+
+    const previewElement = trayPreviewRef.current;
+    let frame = 0;
+
+    const syncPreviewWindow = () => {
+      const rect = previewElement.getBoundingClientRect();
+      const height = Math.ceil(rect.height) * 1.25;
+
+      void invoke("sync_preview_window", { height });
+    };
+
+    const scheduleSync = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(syncPreviewWindow);
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleSync();
+    });
+
+    resizeObserver.observe(previewElement);
+    scheduleSync();
+
+    if ("fonts" in document) {
+      void document.fonts.ready.then(() => {
+        scheduleSync();
+      });
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+      window.cancelAnimationFrame(frame);
+    };
+  }, [
+    isTrayPreview,
+    trayPreviewMessage,
+    uiScale,
+    resolvedThemeTokens["theme-font-family"],
+    resolvedThemeTokens["app-text"],
+    resolvedThemeTokens["note-surface"],
+  ]);
+
+  if (isTrayPreview) {
+    const trayPreviewStyle = {
+      background: resolvedThemeTokens["note-surface"],
+      color: resolvedThemeTokens["app-text"],
+      fontFamily: resolvedThemeTokens["theme-font-family"],
+    } as CSSProperties;
+    const trayPreviewFooterLine = `${formatFooterDate(syncState.lastSyncedAt)} ${footerDetail}`;
+
+    return (
+      <main
+        ref={trayPreviewRef}
+        className="tray-preview-screen"
+        style={trayPreviewStyle}
+      >
+        <p className="tray-preview-message">{trayPreviewMessage}</p>
+        <div className="tray-preview-footer">
+          <span
+            className={`tray-preview-status-orb tray-preview-status-orb-${syncState.status}`}
+            aria-hidden="true"
+          />
+          <span className="tray-preview-footer-line">
+            {trayPreviewFooterLine}
+          </span>
+        </div>
+      </main>
+    );
+  }
+
+  const applyCustomPreference = (
+    overrides: ThemeOverrides,
+    baseThemeId: ThemeId = customThemePreference.baseThemeId,
+  ) => {
     setCustomTheme(overrides, baseThemeId);
   };
 
   const openCustomThemeEditor = () => {
-    applyCustomPreference(customThemePreference.overrides, customThemePreference.baseThemeId);
+    applyCustomPreference(
+      customThemePreference.overrides,
+      customThemePreference.baseThemeId,
+    );
     setThemeSelectorOpen(false);
     setCustomThemeEditorOpen(true);
   };
@@ -240,14 +378,14 @@ function App() {
   const updateCustomColor = (key: CustomColorKey, value: string) => {
     applyCustomPreference({
       ...customThemePreference.overrides,
-      [key]: normalizeHex(value)
+      [key]: normalizeHex(value),
     });
   };
 
   const updateCustomFontFamily = (value: string) => {
     applyCustomPreference({
       ...customThemePreference.overrides,
-      fontFamily: value
+      fontFamily: value,
     });
   };
 
@@ -256,7 +394,10 @@ function App() {
   };
 
   const saveCustomTheme = () => {
-    applyCustomPreference(customThemePreference.overrides, customThemePreference.baseThemeId);
+    applyCustomPreference(
+      customThemePreference.overrides,
+      customThemePreference.baseThemeId,
+    );
     setCustomThemeEditorOpen(false);
   };
 
@@ -268,12 +409,24 @@ function App() {
     "--theme-preview-chrome": customPreviewTokens["chrome-surface"],
     "--theme-preview-line": customPreviewTokens.line,
     "--theme-preview-accent": customThemeBase.accent,
-    "--theme-preview-danger": customThemeBase.danger
+    "--theme-preview-danger": customThemeBase.danger,
   } as CSSProperties;
-  const systemLightPreviewBase = useMemo(() => resolveThemeBase({ kind: "preset", themeId: "paper" }), []);
-  const systemDarkPreviewBase = useMemo(() => resolveThemeBase({ kind: "preset", themeId: "graphite" }), []);
-  const systemLightPreviewTokens = useMemo(() => resolveThemeTokens({ kind: "preset", themeId: "paper" }), []);
-  const systemDarkPreviewTokens = useMemo(() => resolveThemeTokens({ kind: "preset", themeId: "graphite" }), []);
+  const systemLightPreviewBase = useMemo(
+    () => resolveThemeBase({ kind: "preset", themeId: "paper" }),
+    [],
+  );
+  const systemDarkPreviewBase = useMemo(
+    () => resolveThemeBase({ kind: "preset", themeId: "graphite" }),
+    [],
+  );
+  const systemLightPreviewTokens = useMemo(
+    () => resolveThemeTokens({ kind: "preset", themeId: "paper" }),
+    [],
+  );
+  const systemDarkPreviewTokens = useMemo(
+    () => resolveThemeTokens({ kind: "preset", themeId: "graphite" }),
+    [],
+  );
   const systemPreviewStyle = {
     "--theme-preview-shell-left": systemLightPreviewBase.background,
     "--theme-preview-chrome-left": systemLightPreviewTokens["chrome-surface"],
@@ -283,7 +436,7 @@ function App() {
     "--theme-preview-text-left": systemLightPreviewTokens["app-text"],
     "--theme-preview-text-right": systemDarkPreviewTokens["app-text"],
     "--theme-preview-font-family-left": systemLightPreviewBase.fontFamily,
-    "--theme-preview-font-family-right": systemDarkPreviewBase.fontFamily
+    "--theme-preview-font-family-right": systemDarkPreviewBase.fontFamily,
   } as CSSProperties;
 
   if (!isConfigured) {
@@ -335,7 +488,10 @@ function App() {
         </button>
       </header>
 
-      {menuOpen || themeSelectorOpen || localeSelectorOpen || customThemeEditorOpen ? (
+      {menuOpen ||
+      themeSelectorOpen ||
+      localeSelectorOpen ||
+      customThemeEditorOpen ? (
         <button
           className="menu-backdrop"
           aria-label={copy.closePanels}
@@ -351,7 +507,9 @@ function App() {
       <aside className={`menu-sheet ${menuOpen ? "menu-sheet-open" : ""}`}>
         <div className="menu-group">
           <div className="menu-account">
-            <span className="menu-item-detail">{userEmail || copy.noEmail}</span>
+            <span className="menu-item-detail">
+              {userEmail || copy.noEmail}
+            </span>
           </div>
         </div>
         <div className="menu-group">
@@ -401,16 +559,32 @@ function App() {
       </aside>
 
       {themeSelectorOpen ? (
-        <section className="theme-modal" role="dialog" aria-modal="true" aria-label={copy.themeSelectorLabel}>
-          <div className="theme-selector" role="list" aria-label={copy.themeSelectorLabel}>
+        <section
+          className="theme-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={copy.themeSelectorLabel}
+        >
+          <div
+            className="theme-selector"
+            role="list"
+            aria-label={copy.themeSelectorLabel}
+          >
             {presetThemes.map((theme) => {
               const isActive =
                 theme.kind === "system"
                   ? systemThemeActive
                   : theme.kind === "custom"
                     ? customThemeActive
-                    : !customThemeActive && !systemThemeActive && theme.id === activeThemeId;
-              const previewBase = theme.kind === "custom" ? customThemeBase : theme.kind === "preset" ? resolveThemeBase(theme.previewPreference) : null;
+                    : !customThemeActive &&
+                      !systemThemeActive &&
+                      theme.id === activeThemeId;
+              const previewBase =
+                theme.kind === "custom"
+                  ? customThemeBase
+                  : theme.kind === "preset"
+                    ? resolveThemeBase(theme.previewPreference)
+                    : null;
               const previewTokens =
                 theme.kind === "custom"
                   ? customPreviewTokens
@@ -421,25 +595,27 @@ function App() {
                 ...(theme.kind === "system"
                   ? systemPreviewStyle
                   : {
-                      "--theme-preview-font-family": previewTokens?.["theme-font-family"],
+                      "--theme-preview-font-family":
+                        previewTokens?.["theme-font-family"],
                       "--theme-preview-text": previewTokens?.["app-text"],
                       "--theme-preview-bg": previewTokens?.["note-surface"],
-                      "--theme-preview-chrome": previewTokens?.["chrome-surface"],
-                      "--theme-preview-line": previewTokens?.line
+                      "--theme-preview-chrome":
+                        previewTokens?.["chrome-surface"],
+                      "--theme-preview-line": previewTokens?.line,
                     }),
                 ...(theme.kind === "custom"
                   ? {
                       "--theme-preview-shell": customThemeBase.background,
                       "--theme-preview-accent": customThemeBase.accent,
-                      "--theme-preview-danger": customThemeBase.danger
+                      "--theme-preview-danger": customThemeBase.danger,
                     }
                   : theme.kind === "preset" && previewBase
                     ? {
                         "--theme-preview-shell": previewBase.background,
                         "--theme-preview-accent": previewBase.accent,
-                        "--theme-preview-danger": previewBase.danger
+                        "--theme-preview-danger": previewBase.danger,
                       }
-                    : {})
+                    : {}),
               } as CSSProperties;
 
               return (
@@ -454,7 +630,10 @@ function App() {
                       if (theme.kind === "system") {
                         setSystemTheme();
                       } else if (theme.kind === "custom") {
-                        applyCustomPreference(customThemePreference.overrides, customThemePreference.baseThemeId);
+                        applyCustomPreference(
+                          customThemePreference.overrides,
+                          customThemePreference.baseThemeId,
+                        );
                       } else {
                         setPresetTheme(theme.id);
                       }
@@ -471,12 +650,15 @@ function App() {
                                 {
                                   kind: "preset",
                                   id: theme.id,
-                                  colorScheme: previewBase?.colorScheme ?? "light"
+                                  colorScheme:
+                                    previewBase?.colorScheme ?? "light",
                                 },
-                                copy
+                                copy,
                               )}
                       </span>
-                      {isActive ? <span className="theme-option-mark">{copy.active}</span> : null}
+                      {isActive ? (
+                        <span className="theme-option-mark">{copy.active}</span>
+                      ) : null}
                     </span>
                   </button>
                   <button
@@ -499,28 +681,61 @@ function App() {
                     }}
                   >
                     {theme.kind === "system" ? (
-                      <span className="theme-option-preview theme-option-preview-system" style={previewStyle} aria-hidden="true">
+                      <span
+                        className="theme-option-preview theme-option-preview-system"
+                        style={previewStyle}
+                        aria-hidden="true"
+                      >
                         <span className="theme-option-preview-system-base">
                           <span className="theme-option-preview-top" />
-                          <span className="theme-option-preview-note">nota</span>
+                          <span className="theme-option-preview-note">
+                            nota
+                          </span>
                         </span>
                         <span className="theme-option-preview-system-overlay">
                           <span className="theme-option-preview-top" />
-                          <span className="theme-option-preview-note">nota</span>
+                          <span className="theme-option-preview-note">
+                            nota
+                          </span>
                         </span>
                       </span>
                     ) : (
-                      <span className="theme-option-preview" style={previewStyle} aria-hidden="true">
+                      <span
+                        className="theme-option-preview"
+                        style={previewStyle}
+                        aria-hidden="true"
+                      >
                         <span className="theme-option-preview-top" />
                         {theme.kind === "custom" ? (
-                          <span className="theme-option-preview-gear" aria-hidden="true">
+                          <span
+                            className="theme-option-preview-gear"
+                            aria-hidden="true"
+                          >
                             <svg viewBox="0 0 24 24" fill="none">
                               <path d="M5 7.5H19" />
                               <path d="M5 12H19" />
                               <path d="M5 16.5H19" />
-                              <circle cx="9" cy="7.5" r="2.2" fill="currentColor" stroke="none" />
-                              <circle cx="15" cy="12" r="2.2" fill="currentColor" stroke="none" />
-                              <circle cx="11" cy="16.5" r="2.2" fill="currentColor" stroke="none" />
+                              <circle
+                                cx="9"
+                                cy="7.5"
+                                r="2.2"
+                                fill="currentColor"
+                                stroke="none"
+                              />
+                              <circle
+                                cx="15"
+                                cy="12"
+                                r="2.2"
+                                fill="currentColor"
+                                stroke="none"
+                              />
+                              <circle
+                                cx="11"
+                                cy="16.5"
+                                r="2.2"
+                                fill="currentColor"
+                                stroke="none"
+                              />
                             </svg>
                           </span>
                         ) : null}
@@ -532,20 +747,51 @@ function App() {
               );
             })}
           </div>
+          <div className="theme-selector-controls">
+            <label className="theme-scale-control">
+              <span className="theme-scale-label">{copy.textSize}</span>
+              <span className="theme-scale-value">
+                {Math.round(uiScale * 100)}%
+              </span>
+              <input
+                className="theme-scale-slider"
+                type="range"
+                min="0.7"
+                max="1.1"
+                step="0.02"
+                value={uiScale}
+                onChange={(event) => setUiScale(Number(event.target.value))}
+              />
+            </label>
+          </div>
         </section>
       ) : null}
 
       {localeSelectorOpen ? (
-        <section className="theme-modal" role="dialog" aria-modal="true" aria-label={copy.languageSelectorLabel}>
-          <div className="theme-selector" role="list" aria-label={copy.languageSelectorLabel}>
-            {([
-              { id: "es", label: "Español", code: "ES" },
-              { id: "en", label: "English", code: "EN" }
-            ] as const).map((option) => {
+        <section
+          className="theme-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={copy.languageSelectorLabel}
+        >
+          <div
+            className="theme-selector"
+            role="list"
+            aria-label={copy.languageSelectorLabel}
+          >
+            {(
+              [
+                { id: "es", label: "Español", code: "ES" },
+                { id: "en", label: "English", code: "EN" },
+              ] as const
+            ).map((option) => {
               const isActive = locale === option.id;
 
               return (
-                <div key={option.id} className={`theme-option ${isActive ? "theme-option-active" : ""}`}>
+                <div
+                  key={option.id}
+                  className={`theme-option ${isActive ? "theme-option-active" : ""}`}
+                >
                   <button
                     className="theme-option-main"
                     type="button"
@@ -556,7 +802,9 @@ function App() {
                   >
                     <span className="theme-option-copy">
                       <span className="theme-option-label">{option.label}</span>
-                      {isActive ? <span className="theme-option-mark">{copy.active}</span> : null}
+                      {isActive ? (
+                        <span className="theme-option-mark">{copy.active}</span>
+                      ) : null}
                     </span>
                   </button>
                   <button
@@ -569,7 +817,9 @@ function App() {
                   >
                     <span className="theme-option-preview" aria-hidden="true">
                       <span className="theme-option-preview-top" />
-                      <span className="theme-option-preview-note">{option.code}</span>
+                      <span className="theme-option-preview-note">
+                        {option.code}
+                      </span>
                     </span>
                   </button>
                 </div>
@@ -580,13 +830,21 @@ function App() {
       ) : null}
 
       {customThemeEditorOpen ? (
-        <section className="custom-theme-modal" role="dialog" aria-modal="true" aria-label={`${copy.customTheme} editor`}>
+        <section
+          className="custom-theme-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${copy.customTheme} editor`}
+        >
           <div className="custom-theme-sheet">
             <div className="custom-theme-preview" style={customPreviewStyle}>
               <div className="custom-theme-preview-shell">
                 <div className="custom-theme-preview-header">
                   <span className="custom-theme-preview-brand">memoub</span>
-                  <span className="custom-theme-preview-controls" aria-hidden="true">
+                  <span
+                    className="custom-theme-preview-controls"
+                    aria-hidden="true"
+                  >
                     <span />
                     <span />
                     <span />
@@ -594,14 +852,19 @@ function App() {
                 </div>
                 <div className="custom-theme-preview-body">
                   <p className="custom-theme-preview-note">{copy.customNote}</p>
-                  <p className="custom-theme-preview-copy">{copy.customPreviewCopy}</p>
+                  <p className="custom-theme-preview-copy">
+                    {copy.customPreviewCopy}
+                  </p>
                 </div>
                 <div className="custom-theme-preview-footer">
                   <span className="custom-theme-preview-dot" />
                   <span className="custom-theme-preview-status">
                     2026-04-15 | 21:14:59 | {copy.footerSynced}
                   </span>
-                  <span className="custom-theme-preview-status-samples" aria-hidden="true">
+                  <span
+                    className="custom-theme-preview-status-samples"
+                    aria-hidden="true"
+                  >
                     <span className="custom-theme-preview-dot custom-theme-preview-dot-saving" />
                     <span className="custom-theme-preview-dot custom-theme-preview-dot-danger" />
                   </span>
@@ -611,17 +874,32 @@ function App() {
 
             <div className="custom-theme-controls">
               <div className="custom-theme-toolbar">
-                <button className="custom-theme-save" type="button" onClick={saveCustomTheme}>
+                <button
+                  className="custom-theme-save"
+                  type="button"
+                  onClick={saveCustomTheme}
+                >
                   {copy.saveChanges}
                 </button>
 
-                <button className="custom-theme-reset" type="button" onClick={resetCustomTheme}>
+                <button
+                  className="custom-theme-reset"
+                  type="button"
+                  onClick={resetCustomTheme}
+                >
                   {copy.resetCustom}
                 </button>
 
                 <label className="custom-theme-font">
-                  <span className="custom-theme-control-label">{copy.fontFamily}</span>
-                  <select value={customThemeBase.fontFamily} onChange={(event) => updateCustomFontFamily(event.target.value)}>
+                  <span className="custom-theme-control-label">
+                    {copy.fontFamily}
+                  </span>
+                  <select
+                    value={customThemeBase.fontFamily}
+                    onChange={(event) =>
+                      updateCustomFontFamily(event.target.value)
+                    }
+                  >
                     {FONT_FAMILY_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
                         {copy.fontOptions[option.id as FontOptionId]}
@@ -637,13 +915,17 @@ function App() {
 
                   return (
                     <label key={field.key} className="custom-theme-color-row">
-                      <span className="custom-theme-control-label">{copy.colorLabels[field.key]}</span>
+                      <span className="custom-theme-control-label">
+                        {copy.colorLabels[field.key]}
+                      </span>
                       <span className="custom-theme-color-inputs">
                         <input
                           className="custom-theme-color-picker"
                           type="color"
                           value={value}
-                          onChange={(event) => updateCustomColor(field.key, event.target.value)}
+                          onChange={(event) =>
+                            updateCustomColor(field.key, event.target.value)
+                          }
                         />
                       </span>
                       <span className="custom-theme-color-value">{value}</span>
@@ -679,17 +961,41 @@ function App() {
           <div className="conflict-grid">
             <article className="conflict-card">
               <p className="conflict-title">{copy.localVersion}</p>
-              <p className="conflict-time">{formatDate(syncState.conflict.localNote.updatedAt, locale, copy)}</p>
-              <p className="conflict-preview">{previewContent(syncState.conflict.localNote.content) || copy.noText}</p>
-              <button className="primary-button" onClick={() => void keepLocalConflictVersion()}>
+              <p className="conflict-time">
+                {formatDate(
+                  syncState.conflict.localNote.updatedAt,
+                  locale,
+                  copy,
+                )}
+              </p>
+              <p className="conflict-preview">
+                {previewContent(syncState.conflict.localNote.content) ||
+                  copy.noText}
+              </p>
+              <button
+                className="primary-button"
+                onClick={() => void keepLocalConflictVersion()}
+              >
                 {copy.keepLocalVersion}
               </button>
             </article>
             <article className="conflict-card">
               <p className="conflict-title">{copy.remoteVersion}</p>
-              <p className="conflict-time">{formatDate(syncState.conflict.remoteNote.updatedAt, locale, copy)}</p>
-              <p className="conflict-preview">{previewContent(syncState.conflict.remoteNote.content) || copy.noText}</p>
-              <button className="ghost-button" onClick={() => void useRemoteConflictVersion()}>
+              <p className="conflict-time">
+                {formatDate(
+                  syncState.conflict.remoteNote.updatedAt,
+                  locale,
+                  copy,
+                )}
+              </p>
+              <p className="conflict-preview">
+                {previewContent(syncState.conflict.remoteNote.content) ||
+                  copy.noText}
+              </p>
+              <button
+                className="ghost-button"
+                onClick={() => void useRemoteConflictVersion()}
+              >
                 {copy.useRemoteVersion}
               </button>
             </article>
@@ -706,7 +1012,9 @@ function App() {
           />
           <div className="footer-copy">
             <div className="footer-inline">
-              <span className="footer-secondary">{formatFooterDate(syncState.lastSyncedAt)}</span>
+              <span className="footer-secondary">
+                {formatFooterDate(syncState.lastSyncedAt)}
+              </span>
               <span className="footer-tertiary">{footerDetail}</span>
             </div>
           </div>
