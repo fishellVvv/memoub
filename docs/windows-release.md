@@ -131,3 +131,17 @@ memoub_X.Y.Z_x64-setup.exe
 - tray preview correcta
 - release subida a GitHub
 - README apunta al asset correcto de Windows para la version publica vigente
+
+## Carpeta local para subir releases
+
+Si quieres dejar los artefactos listos para publicar en una sola carpeta local, desde la raiz puedes ejecutar:
+
+```powershell
+npm run release:collect
+```
+
+Eso copia el instalador generado a:
+
+```text
+release-assets/memoub-windows-vX.Y.Z-x64-setup.exe
+```

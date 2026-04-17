@@ -40,13 +40,13 @@
 - Base visual y de UX considerada suficientemente pulida para esta fase
 - Icono final de `memoub` definido y aplicado en Android, Windows y web
 - Login Windows validado tambien en instalacion limpia de la app instalada
+- Releases publicas Android `1.0.1` y Windows `1.0.3` ya publicadas
+- README actualizado ya con enlaces a las releases publicas vigentes
 
 ## Siguiente linea de desarrollo
 
-- Preparar las siguientes releases publicas:
-  - Android `1.0.1`
-  - Windows `1.0.3`
-- Actualizar los assets y enlaces publicos del README tras publicar esas releases
+- Definir si Android seguira con distribucion manual por APK o pasara a Play Store
+- Decidir si Windows seguira con distribucion manual por GitHub Releases o tendra una via mas automatizada
 
 ## Pendiente funcional
 

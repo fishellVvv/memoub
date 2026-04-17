@@ -13,3 +13,4 @@ npm-debug.log*
 android/keystore.properties
 android/*.jks
 android/*.keystore
+release-assets/

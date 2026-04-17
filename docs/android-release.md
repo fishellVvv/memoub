@@ -103,6 +103,20 @@ Para que Android actualice correctamente una APK instalada manualmente:
 6. Subirla a GitHub Releases
 7. Distribuirla manualmente
 
+## Carpeta local para subir releases
+
+Si quieres dejar los artefactos listos para publicar en una sola carpeta local, desde la raiz puedes ejecutar:
+
+```powershell
+npm run release:collect
+```
+
+Eso copia la APK generada a:
+
+```text
+release-assets/memoub-android-vX.Y.Z.apk
+```
+
 ## Distribucion manual
 
 Opciones practicas:
