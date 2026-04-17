@@ -11,6 +11,7 @@
 - **Backend**: Supabase
 - **Auth web**: Google OAuth con Supabase Auth
 - **Auth Android**: Google Sign-In nativo + `signInWithIdToken` de Supabase
+- **Auth Windows**: Google OAuth en navegador del sistema + deep link a Tauri + PKCE de Supabase
 - **Base de datos**: Postgres en Supabase
 - **Cache local**: IndexedDB
 - **Testing**: Vitest
@@ -46,8 +47,10 @@
 - La preview de la nota desde el tray ya esta implementada con tema y texto sincronizados
 - El instalador Windows real ya se ha generado y validado fuera de `tauri:dev`
 - La sesion desktop y la preview del tray ya funcionan tambien en la app instalada
+- El login Windows ya se ha validado tambien en instalacion limpia, sin depender de una sesion previa de `tauri:dev`
 - La release publica de Windows ya vive en GitHub Releases
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`
 - Las fuentes del proyecto ya usan familias libres aptas para uso comercial y cargadas con subsets optimizados
+- La iconografia final ya esta aplicada de forma coherente en web, Android y Windows

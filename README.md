@@ -69,10 +69,12 @@ Si te han pasado este repo solo para instalar la app de escritorio, haz esto:
 - APK release firmada validada para distribucion manual fuera de Google Play
 - App Windows nativa empaquetada con Tauri validada ya como instalador real
 - Shell Windows con tray, cierre a tray, arranque con Windows, preview y sesion persistida implementados
+- Login Windows ya resuelto tambien en instalacion limpia de la app instalada
 - Sistema de temas local por dispositivo funcionando
 - Selector de temas con presets, modo sistema y tema `Custom` funcionando
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
 - Sistema tipografico local con fuentes libres y subsets optimizados para `es` y `en`
+- Iconografia final unificada ya aplicada en web, Android y Windows
 
 ## Direccion del producto
 

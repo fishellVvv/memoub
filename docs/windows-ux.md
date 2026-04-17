@@ -30,6 +30,7 @@ Estado actual de esta linea:
 - preview de la nota sobre el tray ya implementada
 - instalador Windows real ya validado fuera de `tauri:dev`
 - release publica Windows ya disponible en GitHub Releases
+- login Windows ya validado tambien en instalacion limpia
 
 ## Comportamiento del icono
 
@@ -59,6 +60,7 @@ Estado actual:
 - la preview ya se resuelve como una mini ventana nativa asociada al tray
 - ya sigue el tema activo y muestra texto + linea final de sincronizacion
 - ya muestra el estado real de la nota y de la sesion en la app instalada
+- ya se ha validado sin depender de una sesion heredada de `tauri:dev`
 - sigue siendo una zona razonable para pulido fino de UX si hiciera falta
 
 ## Ventana principal
@@ -84,6 +86,7 @@ Estado actual:
 - se puede mover, redimensionar, minimizar y maximizar
 - al cerrar, vuelve a tray en lugar de cerrar la app entera
 - la sesion ya se recuerda correctamente al volver a abrir la app instalada
+- el icono final de `memoub` ya esta aplicado en instalador, app y tray
 
 ## Relacion con Android
 

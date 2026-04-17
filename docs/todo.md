@@ -37,28 +37,25 @@
 - Fallback al idioma del sistema implementado con ingles por defecto fuera de variantes del espanol
 - Sistema tipografico migrado a fuentes libres con subsets optimizados para `es` y `en`
 - Direccion UX de Windows documentada
+- Base visual y de UX considerada suficientemente pulida para esta fase
+- Icono final de `memoub` definido y aplicado en Android, Windows y web
+- Login Windows validado tambien en instalacion limpia de la app instalada
 
 ## Siguiente linea de desarrollo
 
-- Diseñar la interfaz mobile-first partiendo de la spec Android
-- Seguir puliendo la experiencia mobile-first y el acabado visual
-- Refinar la UX del selector de temas y del editor `Custom`
-- Refinar la UX del selector de idioma
-- Mejorar UX de estados y mensajes de sincronizacion
-- Seguir puliendo la experiencia desktop una vez cerrada la base de Windows
+- Preparar las siguientes releases publicas:
+  - Android `1.0.1`
+  - Windows `1.0.3`
+- Actualizar los assets y enlaces publicos del README tras publicar esas releases
 
 ## Pendiente funcional
 
-- Revisar si la preview del tray necesita una iteracion final de usabilidad
 - Decidir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 
-## Temas a pulir
+## Calidad y robustez
 
-- Mejorar mensajes de error y estados de sync
-- Revisar accesibilidad y contraste de algunos temas
-- Probar el editor `Custom` en pantallas pequenas y tactiles
 - Vigilar si el bundle de fuentes sigue necesitando mas recorte en el futuro
 - Revisar las vulnerabilidades reportadas por `npm install`
 - Añadir tests de integracion del flujo con Supabase
