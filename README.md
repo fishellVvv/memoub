@@ -5,13 +5,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/fishellVvv/memoub/releases/latest">
+  <a href="https://github.com/fishellVvv/memoub/releases/download/android-v1.0.0/memoub-android-v1.0.0.apk">
     <img alt="Descargar ultima version Android" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Android-2ea44f?style=for-the-badge&logo=android&logoColor=white">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/fishellVvv/memoub/releases/latest">
+  <a href="https://github.com/fishellVvv/memoub/releases/download/windows-v1.0.2/memoub_1.0.2_x64-setup.exe">
     <img alt="Descargar ultima version Windows" src="https://img.shields.io/badge/Descargar%20ultima%20version%20Windows-0078d4?style=for-the-badge&logo=windows11&logoColor=white">
   </a>
 </p>
@@ -39,7 +39,7 @@ La experiencia principal ya esta validada en:
 Si te han pasado este repo solo para instalar la app, haz esto:
 
 1. Pulsa el boton grande de arriba
-2. En la release mas reciente, descarga el archivo `memoub-android-vX.Y.Z.apk`
+2. Se descargara el archivo `memoub-android-v1.0.0.apk`
 3. Instalalo en tu movil Android
 4. Abre `memoub`
 5. Entra con Google
@@ -49,7 +49,7 @@ Si te han pasado este repo solo para instalar la app, haz esto:
 Si te han pasado este repo solo para instalar la app de escritorio, haz esto:
 
 1. Pulsa el boton grande de Windows de arriba
-2. En la release mas reciente, descarga `memoub_X.Y.Z_x64-setup.exe`
+2. Se descargara `memoub_1.0.2_x64-setup.exe`
 3. Ejecuta el instalador
 4. Abre `memoub`
 5. Entra con Google la primera vez
