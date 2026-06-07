@@ -121,6 +121,14 @@ memoub Windows vX.Y.Z
 memoub_X.Y.Z_x64-setup.exe
 ```
 
+## Actualizaciones desde la app
+
+- Las releases Windows usan tags tipo `windows-vX.Y.Z`.
+- La app comprueba actualizaciones desde GitHub Releases.
+- Si hay una actualizacion, abre el instalador o la release correspondiente.
+- No se usa Tauri updater en `1.1.0`.
+- El updater es manual: comprobar, abrir descarga o release, instalar por el usuario.
+
 ## Checklist mental para futuras versiones
 
 - build web correcto
@@ -130,6 +138,7 @@ memoub_X.Y.Z_x64-setup.exe
 - sesion recordada
 - tray preview correcta
 - release subida a GitHub
+- opcion `Check for updates` validada contra `windows-vX.Y.Z`
 - README apunta al asset correcto de Windows para la version publica vigente
 
 ## Carpeta local para subir releases

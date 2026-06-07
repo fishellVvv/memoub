@@ -77,14 +77,15 @@ Antes de generar una nueva APK distribuible, actualiza en [`android/app/build.gr
 Ejemplo:
 
 ```gradle
-versionCode 2
-versionName "1.1"
+versionCode 3
+versionName "1.1.0"
 ```
 
 Regla practica:
 
 - `versionCode` siempre debe **subir**
 - `versionName` es la etiqueta visible para humanos
+- para `1.1.0`, `versionName` debe ser `"1.1.0"` y `versionCode` debe ser `3`
 
 Para que Android actualice correctamente una APK instalada manualmente:
 
@@ -98,10 +99,18 @@ Para que Android actualice correctamente una APK instalada manualmente:
 2. Subir `versionCode` y `versionName`
 3. Ejecutar `./gradlew.bat assembleRelease`
 4. Renombrar la APK con version visible, por ejemplo:
-   - `memoub-android-v1.0.1.apk`
+   - `memoub-android-v1.1.0.apk`
 5. Probar la APK release en un dispositivo real
 6. Subirla a GitHub Releases
 7. Distribuirla manualmente
+
+## Actualizaciones desde la app
+
+- Las releases Android usan tags tipo `android-vX.Y.Z`.
+- La app comprueba actualizaciones desde GitHub Releases.
+- Si hay una actualizacion, abre la release o el APK correspondiente.
+- La app no instala APKs directamente.
+- La app no solicita permisos extra para instalar APK.
 
 ## Carpeta local para subir releases
 
@@ -133,9 +142,10 @@ Nota:
 
 ## Convencion recomendada para futuras versiones
 
-- Tag GitHub: `android-v1.0.1`
-- Titulo de la release: `memoub Android v1.0.1`
-- Asset principal: `memoub-android-v1.0.1.apk`
+- Tag GitHub: `android-vX.Y.Z`
+- Ejemplo para `1.1.0`: `android-v1.1.0`
+- Titulo de la release: `memoub Android vX.Y.Z`
+- Asset principal: `memoub-android-vX.Y.Z.apk`
 
 Ventaja:
 

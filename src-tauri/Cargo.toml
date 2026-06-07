@@ -1,6 +1,6 @@
 [package]
 name = "memoub"
-version = "1.0.3"
+version = "1.1.0"
 description = "memoub Windows desktop app built with Tauri"
 authors = ["FishellVvv"]
 license = ""

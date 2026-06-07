@@ -18,6 +18,8 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Confirmar que la nota persiste.
 - Confirmar que el selector de idioma y temas sigue guardando preferencias locales.
 - Probar al menos `paper`, `graphite`, `sea`, `matrix` y `custom`.
+- Abrir el menu y comprobar que `Buscar actualizaciones` / `Check for updates` no rompe la web.
+- Confirmar que la comprobacion muestra estado de no soportado en web.
 
 ## Android
 
@@ -28,6 +30,13 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Entrar con Google usando el flujo nativo.
 - Escribir offline, volver online y confirmar resincronizacion.
 - Confirmar que una APK nueva actualiza correctamente una version previa firmada con el mismo keystore y `versionCode` superior.
+- Confirmar que existe una release con tag `android-v1.1.0` para validar el comprobador.
+- Abrir el menu y pulsar `Buscar actualizaciones`.
+- Confirmar que no se abre nada automaticamente.
+- Confirmar estado `actualizado` cuando no hay version superior.
+- Confirmar estado `actualizacion disponible` cuando hay version superior.
+- Confirmar que solo abre la actualizacion al pulsar `Abrir actualizacion`.
+- Confirmar fallback: si no hay asset APK valido, se abre la pagina de la release.
 
 ## Windows
 
@@ -40,6 +49,13 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Reabrir desde tray.
 - Pasar el raton sobre el tray y confirmar que la preview refleja nota, tema y estado.
 - Desactivar `Iniciar con Windows`, cerrar con `Quit memoub`, abrir de nuevo y confirmar que la opcion sigue desactivada.
+- Confirmar que existe una release con tag `windows-v1.1.0` para validar el comprobador.
+- Abrir el menu y pulsar `Check for updates`.
+- Confirmar que no se abre nada automaticamente.
+- Confirmar estado `up to date` cuando no hay version superior.
+- Confirmar estado `update available` cuando hay version superior.
+- Confirmar que solo abre la actualizacion al pulsar `Open update`.
+- Confirmar fallback: si no hay asset `.exe` o `.msi` valido, se abre la pagina de la release.
 
 ## Conflictos y sincronizacion
 

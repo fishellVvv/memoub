@@ -49,11 +49,13 @@
 - CI inicial añadida para build/test web, `cargo check` de Tauri y assemble release Android
 - Checklist manual profesional de release y verificacion añadido
 - UI principal parcialmente extraida en componentes para pantallas, menu, idioma, conflicto y footer
+- Comprobador manual de actualizaciones preparado para Android y Windows mediante GitHub Releases
 
 ## Siguiente linea de desarrollo
 
 - Definir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Decidir si Windows seguira con distribucion manual por GitHub Releases o tendra una via mas automatizada
+- Validar manualmente el comprobador de actualizaciones en builds instaladas de Android y Windows
 
 ## Pendiente funcional
 

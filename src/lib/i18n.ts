@@ -39,6 +39,20 @@ export type LocaleMessages = {
   closePanels: string;
   changeTheme: string;
   changeLanguage: string;
+  checkForUpdates: string;
+  checkingUpdates: string;
+  updateAvailableTitle: string;
+  updateAvailableBody: string;
+  updateNotAvailableTitle: string;
+  updateNotAvailableBody: string;
+  updateUnsupportedTitle: string;
+  updateUnsupportedBody: string;
+  updateErrorTitle: string;
+  updateErrorBody: string;
+  openUpdate: string;
+  closeUpdatePanel: string;
+  currentVersionLabel: string;
+  availableVersionLabel: string;
   forceSync: string;
   signOut: string;
   themeSelectorLabel: string;
@@ -120,6 +134,20 @@ const messages: Record<Locale, LocaleMessages> = {
     closePanels: "Cerrar paneles",
     changeTheme: "Cambiar tema",
     changeLanguage: "Cambiar idioma",
+    checkForUpdates: "Buscar actualizaciones",
+    checkingUpdates: "Buscando actualizaciones…",
+    updateAvailableTitle: "Actualización disponible",
+    updateAvailableBody: "Hay una nueva versión de memoub disponible.",
+    updateNotAvailableTitle: "memoub está actualizado",
+    updateNotAvailableBody: "Ya tienes la versión más reciente para este dispositivo.",
+    updateUnsupportedTitle: "Actualizaciones no disponibles",
+    updateUnsupportedBody: "La comprobación de actualizaciones está pensada para las apps instaladas de Android y Windows.",
+    updateErrorTitle: "No se pudo buscar actualizaciones",
+    updateErrorBody: "Revisa tu conexión e inténtalo de nuevo.",
+    openUpdate: "Abrir actualización",
+    closeUpdatePanel: "Cerrar",
+    currentVersionLabel: "Versión actual:",
+    availableVersionLabel: "Versión disponible:",
     forceSync: "Forzar sincronizacion",
     signOut: "Cerrar sesion",
     themeSelectorLabel: "Selector de temas",
@@ -199,6 +227,20 @@ const messages: Record<Locale, LocaleMessages> = {
     closePanels: "Close panels",
     changeTheme: "Change theme",
     changeLanguage: "Change language",
+    checkForUpdates: "Check for updates",
+    checkingUpdates: "Checking for updates…",
+    updateAvailableTitle: "Update available",
+    updateAvailableBody: "A new version of memoub is available.",
+    updateNotAvailableTitle: "memoub is up to date",
+    updateNotAvailableBody: "You already have the latest version for this device.",
+    updateUnsupportedTitle: "Updates unavailable",
+    updateUnsupportedBody: "Update checks are intended for the installed Android and Windows apps.",
+    updateErrorTitle: "Could not check for updates",
+    updateErrorBody: "Check your connection and try again.",
+    openUpdate: "Open update",
+    closeUpdatePanel: "Close",
+    currentVersionLabel: "Current version:",
+    availableVersionLabel: "Available version:",
     forceSync: "Force sync",
     signOut: "Sign out",
     themeSelectorLabel: "Theme selector",

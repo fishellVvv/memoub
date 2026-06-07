@@ -6,8 +6,10 @@ type AppMenuProps = {
   userEmail: string;
   onChangeTheme: () => void;
   onChangeLanguage: () => void;
+  onCheckUpdates: () => void;
   onRetrySync: () => void;
   onSignOut: () => void;
+  checkingUpdates: boolean;
 };
 
 export function AppMenu({
@@ -16,8 +18,10 @@ export function AppMenu({
   userEmail,
   onChangeTheme,
   onChangeLanguage,
+  onCheckUpdates,
   onRetrySync,
   onSignOut,
+  checkingUpdates,
 }: AppMenuProps) {
   return (
     <aside className={`menu-sheet ${open ? "menu-sheet-open" : ""}`}>
@@ -36,6 +40,14 @@ export function AppMenu({
         </button>
         <button className="menu-item-button" type="button" onClick={onChangeLanguage}>
           {copy.changeLanguage}
+        </button>
+        <button
+          className="menu-item-button"
+          type="button"
+          onClick={onCheckUpdates}
+          disabled={checkingUpdates}
+        >
+          {checkingUpdates ? copy.checkingUpdates : copy.checkForUpdates}
         </button>
       </div>
       <div className="menu-group">

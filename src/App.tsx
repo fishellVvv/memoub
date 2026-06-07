@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
@@ -9,6 +10,7 @@ import { AuthScreen, ConfigScreen } from "./components/AppShellScreens";
 import { ConflictSheet } from "./components/ConflictSheet";
 import { LocaleSelector } from "./components/LocaleSelector";
 import { formatPreviewFooterDate, SyncFooter } from "./components/SyncFooter";
+import { UpdateSheet } from "./components/UpdateSheet";
 import { useMemoubApp } from "./hooks/useMemoubApp";
 import { useLocale } from "./hooks/useLocale";
 import { useTheme } from "./hooks/useTheme";
@@ -16,6 +18,7 @@ import { useUiScale } from "./hooks/useUiScale";
 import type { DesktopPreviewSnapshot } from "./lib/desktop";
 import { isTauriDesktop } from "./lib/desktop";
 import { pushDesktopPreviewSnapshot } from "./lib/desktop-preview";
+import { openExternalUrl } from "./lib/external-url";
 import type { LocaleMessages } from "./lib/i18n";
 import {
   resolveThemeBase,
@@ -25,6 +28,9 @@ import {
   type ThemePreference,
 } from "./lib/theme";
 import type { SyncState } from "./lib/types";
+import { checkCurrentAppUpdates } from "./lib/updates/check-current-app-updates";
+import { getUpdateUrl } from "./lib/updates/get-update-url";
+import type { UpdateCheckResult } from "./lib/updates/types";
 
 const CUSTOM_COLOR_FIELDS = [
   { key: "background" },
@@ -184,6 +190,9 @@ function App() {
   const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
   const [localeSelectorOpen, setLocaleSelectorOpen] = useState(false);
   const [customThemeEditorOpen, setCustomThemeEditorOpen] = useState(false);
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
+  const checkingUpdatesRef = useRef(false);
 
   const statusMeta = useMemo(() => {
     switch (syncState.status) {
@@ -231,6 +240,9 @@ function App() {
       setThemeSelectorOpen(false);
       setLocaleSelectorOpen(false);
       setCustomThemeEditorOpen(false);
+      setIsCheckingUpdates(false);
+      checkingUpdatesRef.current = false;
+      setUpdateResult(null);
     }
   }, [authState]);
 
@@ -311,6 +323,63 @@ function App() {
     setCustomThemeEditorOpen(false);
   };
 
+  const checkForAppUpdates = async () => {
+    if (checkingUpdatesRef.current) {
+      return;
+    }
+
+    checkingUpdatesRef.current = true;
+    setMenuOpen(false);
+    setThemeSelectorOpen(false);
+    setLocaleSelectorOpen(false);
+    setCustomThemeEditorOpen(false);
+    setUpdateResult(null);
+    setIsCheckingUpdates(true);
+
+    try {
+      setUpdateResult(await checkCurrentAppUpdates());
+    } catch (error) {
+      setUpdateResult({
+        status: "error",
+        platform: "web",
+        currentVersion: "",
+        error: error instanceof Error ? error.message : "Could not check for updates.",
+      });
+    } finally {
+      checkingUpdatesRef.current = false;
+      setIsCheckingUpdates(false);
+    }
+  };
+
+  const openAvailableUpdate = async () => {
+    if (updateResult?.status !== "available") {
+      return;
+    }
+
+    const updateUrl = getUpdateUrl(updateResult);
+
+    if (!updateUrl) {
+      setUpdateResult({
+        status: "error",
+        platform: updateResult.platform,
+        currentVersion: updateResult.currentVersion,
+        error: "No update URL is available.",
+      });
+      return;
+    }
+
+    try {
+      await openExternalUrl(updateUrl, updateResult.platform);
+    } catch (error) {
+      setUpdateResult({
+        status: "error",
+        platform: updateResult.platform,
+        currentVersion: updateResult.currentVersion,
+        error: error instanceof Error ? error.message : "Could not open update URL.",
+      });
+    }
+  };
+
   const customPreviewStyle = {
     "--theme-preview-shell": customThemeBase.background,
     "--theme-preview-font-family": customPreviewTokens["theme-font-family"],
@@ -377,7 +446,9 @@ function App() {
       {menuOpen ||
       themeSelectorOpen ||
       localeSelectorOpen ||
-      customThemeEditorOpen ? (
+      customThemeEditorOpen ||
+      isCheckingUpdates ||
+      updateResult ? (
         <button
           className="menu-backdrop"
           aria-label={copy.closePanels}
@@ -386,6 +457,9 @@ function App() {
             setThemeSelectorOpen(false);
             setLocaleSelectorOpen(false);
             setCustomThemeEditorOpen(false);
+            if (!isCheckingUpdates) {
+              setUpdateResult(null);
+            }
           }}
         />
       ) : null}
@@ -402,6 +476,7 @@ function App() {
           setMenuOpen(false);
           setLocaleSelectorOpen(true);
         }}
+        onCheckUpdates={() => void checkForAppUpdates()}
         onRetrySync={() => {
           setMenuOpen(false);
           void retrySync();
@@ -410,6 +485,7 @@ function App() {
           setMenuOpen(false);
           void signOut();
         }}
+        checkingUpdates={isCheckingUpdates}
       />
 
       {themeSelectorOpen ? (
@@ -739,6 +815,20 @@ function App() {
             </div>
           </div>
         </section>
+      ) : null}
+
+      {isCheckingUpdates || updateResult ? (
+        <UpdateSheet
+          copy={copy}
+          checking={isCheckingUpdates}
+          result={updateResult}
+          onOpenUpdate={() => void openAvailableUpdate()}
+          onClose={() => {
+            if (!isCheckingUpdates) {
+              setUpdateResult(null);
+            }
+          }}
+        />
       ) : null}
 
       <label className="sr-only" htmlFor="note-editor">
