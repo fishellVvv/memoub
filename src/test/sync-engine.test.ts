@@ -13,6 +13,24 @@ function buildNote(overrides: Partial<Note> = {}): Note {
   };
 }
 
+function deferredPromise() {
+  let resolvePromise: () => void = () => undefined;
+  const promise = new Promise<void>((resolve) => {
+    resolvePromise = resolve;
+  });
+
+  return {
+    promise,
+    resolve: resolvePromise
+  };
+}
+
+async function flushPromises(times = 3): Promise<void> {
+  for (let index = 0; index < times; index += 1) {
+    await Promise.resolve();
+  }
+}
+
 describe("createDebouncedTask", () => {
   it("runs only once after consecutive schedules", async () => {
     vi.useFakeTimers();
@@ -127,6 +145,113 @@ describe("SyncEngine", () => {
       status: "offline",
       hasPendingChanges: true
     });
+  });
+
+  it("serializes rapid local edits so the newest snapshot is stored last", async () => {
+    const savedSnapshots: LocalNoteSnapshot[] = [];
+    const pendingSaves: Array<ReturnType<typeof deferredPromise>> = [];
+
+    const repository = {
+      loadLocal: vi.fn(async () => null),
+      saveLocal: vi.fn((snapshot: LocalNoteSnapshot) => {
+        const deferred = deferredPromise();
+        pendingSaves.push(deferred);
+        return deferred.promise.then(() => {
+          savedSnapshots.push(snapshot);
+        });
+      }),
+      fetchRemote: vi.fn(async () => null),
+      upsertRemote: vi.fn(async (note: Note) => note)
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      () => undefined,
+      () => undefined
+    );
+
+    await engine.bootstrap(false);
+
+    const firstEdit = engine.stageLocalEdit("uno", false);
+    const secondEdit = engine.stageLocalEdit("dos", false);
+    const thirdEdit = engine.stageLocalEdit("tres", false);
+
+    await flushPromises();
+    expect(repository.saveLocal).toHaveBeenCalledTimes(1);
+
+    pendingSaves[0].resolve();
+    await firstEdit;
+    await flushPromises();
+    expect(repository.saveLocal).toHaveBeenCalledTimes(2);
+
+    pendingSaves[1].resolve();
+    await secondEdit;
+    await flushPromises();
+    expect(repository.saveLocal).toHaveBeenCalledTimes(3);
+
+    pendingSaves[2].resolve();
+    await thirdEdit;
+
+    expect(savedSnapshots.map((snapshot) => snapshot.note.content)).toEqual([
+      "uno",
+      "dos",
+      "tres"
+    ]);
+    expect(savedSnapshots.at(-1)).toMatchObject({
+      pendingChanges: true,
+      note: {
+        content: "tres"
+      }
+    });
+  });
+
+  it("marks edits as pending before IndexedDB finishes so concurrent sync detects conflicts", async () => {
+    let latestState: SyncState | null = null;
+    const pendingSave = deferredPromise();
+
+    const repository = {
+      loadLocal: vi.fn(async () => null),
+      saveLocal: vi
+        .fn<(_: LocalNoteSnapshot) => Promise<void>>()
+        .mockResolvedValueOnce(undefined)
+        .mockImplementationOnce(() => pendingSave.promise),
+      fetchRemote: vi
+        .fn<() => Promise<Note | null>>()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(
+          buildNote({
+            id: "shared-id",
+            content: "remote while local save is pending",
+            updatedAt: "2026-04-15T10:01:00.000Z"
+          })
+        ),
+      upsertRemote: vi.fn(async (note: Note) => note)
+    };
+
+    const engine = new SyncEngine(
+      repository,
+      "user-1",
+      () => undefined,
+      (state) => {
+        latestState = state;
+      }
+    );
+
+    await engine.bootstrap(true);
+
+    const editPromise = engine.stageLocalEdit("local save still pending", true);
+    await Promise.resolve();
+    await engine.syncNow(true);
+
+    expect(repository.upsertRemote).not.toHaveBeenCalled();
+    expect(latestState).toMatchObject({
+      status: "conflict",
+      hasPendingChanges: true
+    });
+
+    pendingSave.resolve();
+    await editPromise;
   });
 
   it("applies a newer remote note during refresh", async () => {

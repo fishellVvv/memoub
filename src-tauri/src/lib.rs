@@ -298,12 +298,6 @@ pub fn run() {
       #[cfg(any(windows, target_os = "linux"))]
       app.deep_link().register_all()?;
 
-      if let Ok(enabled) = app.autolaunch().is_enabled() {
-        if !enabled {
-          let _ = app.autolaunch().enable();
-        }
-      }
-
       build_preview_window(app.handle())?;
       build_tray(app.handle())?;
       wire_main_window_behavior(app.handle());

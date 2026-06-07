@@ -4,6 +4,11 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { AppMenu } from "./components/AppMenu";
+import { AuthScreen, ConfigScreen } from "./components/AppShellScreens";
+import { ConflictSheet } from "./components/ConflictSheet";
+import { LocaleSelector } from "./components/LocaleSelector";
+import { formatPreviewFooterDate, SyncFooter } from "./components/SyncFooter";
 import { useMemoubApp } from "./hooks/useMemoubApp";
 import { useLocale } from "./hooks/useLocale";
 import { useTheme } from "./hooks/useTheme";
@@ -11,7 +16,7 @@ import { useUiScale } from "./hooks/useUiScale";
 import type { DesktopPreviewSnapshot } from "./lib/desktop";
 import { isTauriDesktop } from "./lib/desktop";
 import { pushDesktopPreviewSnapshot } from "./lib/desktop-preview";
-import type { Locale, LocaleMessages } from "./lib/i18n";
+import type { LocaleMessages } from "./lib/i18n";
 import {
   resolveThemeBase,
   resolveThemeTokens,
@@ -103,46 +108,6 @@ function normalizeHex(color: string): string {
   }
 
   return `#${sanitized.slice(0, 6)}`;
-}
-
-function formatDate(
-  value: string | null,
-  locale: Locale,
-  copy: LocaleMessages,
-): string {
-  if (!value) {
-    return copy.noSyncYet;
-  }
-
-  return new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-US", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
-function formatFooterDate(value: string | null, copy?: LocaleMessages): string {
-  if (!value) {
-    return copy?.noSyncYet ?? "Aun sin sincronizar";
-  }
-
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  return `${year}-${month}-${day} | ${hours}:${minutes}:${seconds}`;
-}
-
-function previewContent(content: string): string {
-  const trimmed = content.trim();
-  if (!trimmed) {
-    return "";
-  }
-
-  return trimmed.length > 140 ? `${trimmed.slice(0, 140)}...` : trimmed;
 }
 
 function normalizeFooterMessage(
@@ -278,7 +243,7 @@ function App() {
     const nextSnapshot: DesktopPreviewSnapshot = {
       message: hasPreviewContent ? noteContent.trim() || copy.noText : "",
       footerLine: hasPreviewContent
-        ? `${formatFooterDate(syncState.lastSyncedAt, copy)} | ${footerDetail}`
+        ? `${formatPreviewFooterDate(syncState.lastSyncedAt, copy)} | ${footerDetail}`
         : "",
       status: hasPreviewContent ? syncState.status : "idle",
       theme: {
@@ -385,35 +350,11 @@ function App() {
   } as CSSProperties;
 
   if (!isConfigured) {
-    return (
-      <main className="shell">
-        <section className="card hero-card">
-          <p className="eyebrow">{copy.configEyebrow}</p>
-          <h1>{copy.configTitle}</h1>
-          <p className="lead">
-            {copy.configLeadBefore}
-            <code>VITE_SUPABASE_URL</code> y <code>VITE_SUPABASE_ANON_KEY</code>
-            {copy.configLeadAfter}
-          </p>
-          <p className="helper">{copy.configHelper}</p>
-        </section>
-      </main>
-    );
+    return <ConfigScreen copy={copy} />;
   }
 
   if (authState !== "authenticated") {
-    return (
-      <main className="shell">
-        <section className="card hero-card">
-          <p className="eyebrow">{copy.authEyebrow}</p>
-          <h1>{copy.authTitle}</h1>
-          <p className="lead">{copy.authLead}</p>
-          <button className="primary-button" onClick={() => void signIn()}>
-            {copy.signInWithGoogle}
-          </button>
-        </section>
-      </main>
-    );
+    return <AuthScreen copy={copy} onSignIn={() => void signIn()} />;
   }
 
   return (
@@ -449,59 +390,27 @@ function App() {
         />
       ) : null}
 
-      <aside className={`menu-sheet ${menuOpen ? "menu-sheet-open" : ""}`}>
-        <div className="menu-group">
-          <div className="menu-account">
-            <span className="menu-item-detail">
-              {userEmail || copy.noEmail}
-            </span>
-          </div>
-        </div>
-        <div className="menu-group">
-          <button
-            className="menu-item-button menu-item-button-split"
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              setThemeSelectorOpen(true);
-            }}
-          >
-            <span>{copy.changeTheme}</span>
-          </button>
-          <button
-            className="menu-item-button"
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              setLocaleSelectorOpen(true);
-            }}
-          >
-            {copy.changeLanguage}
-          </button>
-        </div>
-        <div className="menu-group">
-          <button
-            className="menu-item-button"
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              void retrySync();
-            }}
-          >
-            {copy.forceSync}
-          </button>
-          <button
-            className="menu-item-button menu-item-button-danger"
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              void signOut();
-            }}
-          >
-            {copy.signOut}
-          </button>
-        </div>
-      </aside>
+      <AppMenu
+        copy={copy}
+        open={menuOpen}
+        userEmail={userEmail}
+        onChangeTheme={() => {
+          setMenuOpen(false);
+          setThemeSelectorOpen(true);
+        }}
+        onChangeLanguage={() => {
+          setMenuOpen(false);
+          setLocaleSelectorOpen(true);
+        }}
+        onRetrySync={() => {
+          setMenuOpen(false);
+          void retrySync();
+        }}
+        onSignOut={() => {
+          setMenuOpen(false);
+          void signOut();
+        }}
+      />
 
       {themeSelectorOpen ? (
         <section
@@ -713,65 +622,14 @@ function App() {
       ) : null}
 
       {localeSelectorOpen ? (
-        <section
-          className="theme-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label={copy.languageSelectorLabel}
-        >
-          <div
-            className="theme-selector"
-            role="list"
-            aria-label={copy.languageSelectorLabel}
-          >
-            {(
-              [
-                { id: "es", label: "Español", code: "ES" },
-                { id: "en", label: "English", code: "EN" },
-              ] as const
-            ).map((option) => {
-              const isActive = locale === option.id;
-
-              return (
-                <div
-                  key={option.id}
-                  className={`theme-option ${isActive ? "theme-option-active" : ""}`}
-                >
-                  <button
-                    className="theme-option-main"
-                    type="button"
-                    onClick={() => {
-                      setLocale(option.id);
-                      setLocaleSelectorOpen(false);
-                    }}
-                  >
-                    <span className="theme-option-copy">
-                      <span className="theme-option-label">{option.label}</span>
-                      {isActive ? (
-                        <span className="theme-option-mark">{copy.active}</span>
-                      ) : null}
-                    </span>
-                  </button>
-                  <button
-                    className="theme-option-preview-button"
-                    type="button"
-                    onClick={() => {
-                      setLocale(option.id);
-                      setLocaleSelectorOpen(false);
-                    }}
-                  >
-                    <span className="theme-option-preview" aria-hidden="true">
-                      <span className="theme-option-preview-top" />
-                      <span className="theme-option-preview-note">
-                        {option.code}
-                      </span>
-                    </span>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        <LocaleSelector
+          copy={copy}
+          locale={locale}
+          onSelectLocale={(nextLocale) => {
+            setLocale(nextLocale);
+            setLocaleSelectorOpen(false);
+          }}
+        />
       ) : null}
 
       {customThemeEditorOpen ? (
@@ -897,74 +755,21 @@ function App() {
       />
 
       {syncState.conflict ? (
-        <section className="conflict-sheet">
-          <div className="conflict-sheet-copy">
-            <p className="eyebrow">{copy.conflictEyebrow}</p>
-            <h2>{copy.conflictTitle}</h2>
-            <p>{copy.conflictBody}</p>
-          </div>
-          <div className="conflict-grid">
-            <article className="conflict-card">
-              <p className="conflict-title">{copy.localVersion}</p>
-              <p className="conflict-time">
-                {formatDate(
-                  syncState.conflict.localNote.updatedAt,
-                  locale,
-                  copy,
-                )}
-              </p>
-              <p className="conflict-preview">
-                {previewContent(syncState.conflict.localNote.content) ||
-                  copy.noText}
-              </p>
-              <button
-                className="primary-button"
-                onClick={() => void keepLocalConflictVersion()}
-              >
-                {copy.keepLocalVersion}
-              </button>
-            </article>
-            <article className="conflict-card">
-              <p className="conflict-title">{copy.remoteVersion}</p>
-              <p className="conflict-time">
-                {formatDate(
-                  syncState.conflict.remoteNote.updatedAt,
-                  locale,
-                  copy,
-                )}
-              </p>
-              <p className="conflict-preview">
-                {previewContent(syncState.conflict.remoteNote.content) ||
-                  copy.noText}
-              </p>
-              <button
-                className="ghost-button"
-                onClick={() => void useRemoteConflictVersion()}
-              >
-                {copy.useRemoteVersion}
-              </button>
-            </article>
-          </div>
-        </section>
+        <ConflictSheet
+          conflict={syncState.conflict}
+          copy={copy}
+          locale={locale}
+          onKeepLocal={() => void keepLocalConflictVersion()}
+          onUseRemote={() => void useRemoteConflictVersion()}
+        />
       ) : null}
 
-      <footer className={`mobile-footer footer-${syncState.status}`}>
-        <div className="footer-status-block">
-          <span
-            className={`status-orb status-orb-${syncState.status}`}
-            title={statusMeta.label}
-            aria-label={statusMeta.label}
-          />
-          <div className="footer-copy">
-            <div className="footer-inline">
-              <span className="footer-secondary">
-                {formatFooterDate(syncState.lastSyncedAt, copy)}
-              </span>
-              <span className="footer-tertiary">{footerDetail}</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SyncFooter
+        copy={copy}
+        syncState={syncState}
+        statusLabel={statusMeta.label}
+        footerDetail={footerDetail}
+      />
     </main>
   );
 }

@@ -69,6 +69,7 @@ function buildSnapshot(note: Note, pendingChanges: boolean, lastSyncedAt: string
 
 export class SyncEngine {
   private currentNote: Note | null = null;
+  private localWriteQueue: Promise<void> = Promise.resolve();
   private syncState: SyncState = {
     status: "idle",
     lastSyncedAt: null,
@@ -119,7 +120,7 @@ export class SyncEngine {
     if (localSnapshot?.pendingChanges && localSnapshot.note) {
       if (!hasRemoteChangedSince(localSnapshot.lastSyncedAt, remoteNote)) {
         const syncedNote = await this.repository.upsertRemote(localSnapshot.note);
-        await this.repository.saveLocal(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
+        await this.saveLocalSnapshot(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
         this.currentNote = syncedNote;
         this.updateNote(syncedNote);
         this.setState({
@@ -140,7 +141,7 @@ export class SyncEngine {
 
     this.currentNote = preferredNote;
     this.updateNote(preferredNote);
-    await this.repository.saveLocal(buildSnapshot(preferredNote, false, remoteNote?.updatedAt ?? localSnapshot?.lastSyncedAt ?? null));
+    await this.saveLocalSnapshot(buildSnapshot(preferredNote, false, remoteNote?.updatedAt ?? localSnapshot?.lastSyncedAt ?? null));
     this.setState({
       status: "saved",
       hasPendingChanges: false,
@@ -161,13 +162,13 @@ export class SyncEngine {
 
     this.currentNote = updatedNote;
     this.updateNote(updatedNote);
-    await this.repository.saveLocal(buildSnapshot(updatedNote, true, this.syncState.lastSyncedAt));
     this.setState({
       status: isOnline ? "idle" : "offline",
       hasPendingChanges: true,
       message: isOnline ? "Cambios pendientes de sincronizar." : "Sin conexion. Guardado en local.",
       conflict: null
     });
+    await this.saveLocalSnapshot(buildSnapshot(updatedNote, true, this.syncState.lastSyncedAt));
 
     return updatedNote;
   }
@@ -208,7 +209,7 @@ export class SyncEngine {
       if (preferredNote !== this.currentNote) {
         this.currentNote = preferredNote;
         this.updateNote(preferredNote);
-        await this.repository.saveLocal(buildSnapshot(preferredNote, false, preferredNote.updatedAt));
+        await this.saveLocalSnapshot(buildSnapshot(preferredNote, false, preferredNote.updatedAt));
         this.setState({
           status: "saved",
           hasPendingChanges: false,
@@ -222,7 +223,7 @@ export class SyncEngine {
       const syncedNote = await this.repository.upsertRemote(this.currentNote);
       this.currentNote = syncedNote;
       this.updateNote(syncedNote);
-      await this.repository.saveLocal(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
+      await this.saveLocalSnapshot(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
       this.setState({
         status: "saved",
         hasPendingChanges: false,
@@ -256,7 +257,7 @@ export class SyncEngine {
     if (!this.currentNote) {
       this.currentNote = remoteNote;
       this.updateNote(remoteNote);
-      await this.repository.saveLocal(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
+      await this.saveLocalSnapshot(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
       this.setState({
         status: "saved",
         hasPendingChanges: false,
@@ -274,7 +275,7 @@ export class SyncEngine {
 
     this.currentNote = remoteNote;
     this.updateNote(remoteNote);
-    await this.repository.saveLocal(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
+    await this.saveLocalSnapshot(buildSnapshot(remoteNote, false, remoteNote.updatedAt));
     this.setState({
       status: "saved",
       hasPendingChanges: false,
@@ -294,7 +295,7 @@ export class SyncEngine {
     if (choice === "remote") {
       this.currentNote = conflict.remoteNote;
       this.updateNote(conflict.remoteNote);
-      await this.repository.saveLocal(buildSnapshot(conflict.remoteNote, false, conflict.remoteNote.updatedAt));
+      await this.saveLocalSnapshot(buildSnapshot(conflict.remoteNote, false, conflict.remoteNote.updatedAt));
       this.setState({
         status: "saved",
         hasPendingChanges: false,
@@ -314,7 +315,7 @@ export class SyncEngine {
     const syncedNote = await this.repository.upsertRemote(conflict.localNote);
     this.currentNote = syncedNote;
     this.updateNote(syncedNote);
-    await this.repository.saveLocal(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
+    await this.saveLocalSnapshot(buildSnapshot(syncedNote, false, syncedNote.updatedAt));
     this.setState({
       status: "saved",
       hasPendingChanges: false,
@@ -338,6 +339,14 @@ export class SyncEngine {
       message: "Hay cambios distintos en otro dispositivo. Elige que version mantener.",
       conflict
     });
+  }
+
+  private async saveLocalSnapshot(snapshot: LocalNoteSnapshot): Promise<void> {
+    this.localWriteQueue = this.localWriteQueue
+      .catch(() => undefined)
+      .then(() => this.repository.saveLocal(snapshot));
+
+    await this.localWriteQueue;
   }
 
   private setState(partial: Partial<SyncState>): void {

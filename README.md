@@ -160,3 +160,4 @@ Detalle tecnico:
 - [Sistema de temas](docs/theme-system.md)
 - [Release Android manual](docs/android-release.md)
 - [Release Windows manual](docs/windows-release.md)
+- [Checklist de verificacion profesional](docs/release-checklist.md)

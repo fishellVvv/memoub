@@ -9,6 +9,8 @@ type NoteRow = {
   updated_at: string;
 };
 
+type NoteWriteRow = Omit<NoteRow, "updated_at">;
+
 const LOCAL_NOTE_KEY_PREFIX = "note:";
 
 function noteKey(userId: string): string {
@@ -24,12 +26,11 @@ function rowToNote(row: NoteRow): Note {
   };
 }
 
-function noteToRow(note: Note): NoteRow {
+function noteToRow(note: Note): NoteWriteRow {
   return {
     id: note.id,
     user_id: note.userId,
-    content: note.content,
-    updated_at: note.updatedAt
+    content: note.content
   };
 }
 

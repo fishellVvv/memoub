@@ -42,6 +42,13 @@
 - Login Windows validado tambien en instalacion limpia de la app instalada
 - Releases publicas Android `1.0.1` y Windows `1.0.3` ya publicadas
 - README actualizado ya con enlaces a las releases publicas vigentes
+- Escrituras locales serializadas para evitar carreras entre ediciones rapidas
+- `updated_at` movido a fuente de verdad de Supabase mediante trigger
+- Autostart de Windows corregido para respetar la opcion desactivada por el usuario
+- Seguridad base endurecida con CSP en Tauri y backup Android desactivado
+- CI inicial añadida para build/test web, `cargo check` de Tauri y assemble release Android
+- Checklist manual profesional de release y verificacion añadido
+- UI principal parcialmente extraida en componentes para pantallas, menu, idioma, conflicto y footer
 
 ## Siguiente linea de desarrollo
 
@@ -57,7 +64,8 @@
 ## Calidad y robustez
 
 - Vigilar si el bundle de fuentes sigue necesitando mas recorte en el futuro
-- Revisar las vulnerabilidades reportadas por `npm install`
+- Revisar vulnerabilidades con `npm audit` solo tras aprobar el envio de metadatos a npm
 - Añadir tests de integracion del flujo con Supabase
-- Añadir pruebas manuales documentadas para instalacion Android y Windows
+- Ejecutar y mantener el checklist manual documentado para instalacion Android y Windows
+- Extraer selector/editor de tema y dividir CSS fisicamente en una pasada dedicada
 - Mantener fuera del repo publico cualquier clave secreta, client secret o configuracion sensible
