@@ -5,13 +5,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/fishellVvv/memoub/releases/download/android-v1.0.1/memoub-android-v1.0.1.apk">
+  <a href="https://github.com/fishellVvv/memoub/releases/download/android-v1.1.0/memoub-android-v1.1.0.apk">
     <img alt="Descargar ultima version Android" src="docs/assets/badge-android.svg">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/fishellVvv/memoub/releases/download/windows-v1.0.3/memoub-windows-v1.0.3-x64-setup.exe">
+  <a href="https://github.com/fishellVvv/memoub/releases/download/windows-v1.1.0/memoub-windows-v1.1.0-x64-setup.exe">
     <img alt="Descargar ultima version Windows" src="docs/assets/badge-windows.svg">
   </a>
 </p>
@@ -26,6 +26,15 @@
 
 `memoub` es una app minima para mantener **una unica nota sincronizada** entre dispositivos.
 
+El enfoque es deliberadamente pequeno:
+
+- una sola nota por usuario
+- texto plano
+- guardado y sincronizacion automatica
+- soporte offline basico con cache local
+- Android como experiencia principal
+- Windows como companion ligero con tray
+
 La experiencia principal ya esta validada en:
 
 - web en produccion
@@ -39,7 +48,7 @@ La experiencia principal ya esta validada en:
 Si te han pasado este repo solo para instalar la app, haz esto:
 
 1. Pulsa el boton grande de arriba
-2. Se descargara el archivo `memoub-android-v1.0.1.apk`
+2. Se descargara el archivo `memoub-android-v1.1.0.apk`
 3. Instalalo en tu movil Android
 4. Abre `memoub`
 5. Entra con Google
@@ -49,13 +58,14 @@ Si te han pasado este repo solo para instalar la app, haz esto:
 Si te han pasado este repo solo para instalar la app de escritorio, haz esto:
 
 1. Pulsa el boton grande de Windows de arriba
-2. Se descargara `memoub-windows-v1.0.3-x64-setup.exe`
+2. Se descargara `memoub-windows-v1.1.0-x64-setup.exe`
 3. Ejecuta el instalador
 4. Abre `memoub`
 5. Entra con Google la primera vez
 
 ## Estado actual
 
+- Version publica actual: `1.1.0`
 - Login con Google funcionando en local y en produccion
 - Guardado de la nota funcionando en Supabase
 - Persistencia correcta al recargar la aplicacion
@@ -75,6 +85,7 @@ Si te han pasado este repo solo para instalar la app de escritorio, haz esto:
 - Selector de idioma con `es` y `en`, con fallback al idioma del sistema
 - Sistema tipografico local con fuentes libres y subsets optimizados para `es` y `en`
 - Iconografia final unificada ya aplicada en web, Android y Windows
+- Busqueda manual de actualizaciones desde el menu en Android y Windows
 
 ## Direccion del producto
 
@@ -96,6 +107,7 @@ Base de esa direccion:
 - Empaquetado con Capacitor
 - Login nativo de Google dentro de la app
 - Distribucion actual por APK firmada en GitHub Releases
+- Sin Play Store por ahora
 
 Detalle tecnico:
 
@@ -109,6 +121,7 @@ Detalle tecnico:
 - Tray residente con reapertura rapida, cierre a tray y preview de la nota
 - Arranque con Windows configurable desde el menu del tray
 - Distribucion actual por instalador `.exe` en GitHub Releases
+- Sin Microsoft Store por ahora
 - Direccion UX: [Spec Windows](docs/windows-ux.md)
 
 Detalle tecnico:
@@ -126,6 +139,19 @@ Detalle tecnico:
 - Sistema de temas local con presets, modo sistema y `Custom`
 - Localizacion ligera con selector manual y fallback al idioma del sistema
 - Fuentes libres autoalojadas con subsets `latin` y `latin-ext`
+
+## Actualizaciones
+
+Desde `1.1.0`, Android y Windows incluyen busqueda manual de actualizaciones desde el menu:
+
+- ES: `Buscar actualizaciones`
+- EN: `Check for updates`
+
+La app comprueba GitHub Releases y muestra el resultado antes de abrir nada. Solo abre la descarga o la release cuando el usuario pulsa el boton de actualizacion.
+
+No hay auto-updater silencioso, no se usa Tauri updater y la app no instala APKs directamente ni solicita permisos extra para instalar APK.
+
+Los usuarios en versiones `1.0.x` deben actualizar manualmente desde GitHub Releases, porque esas versiones todavia no incluian el sistema de busqueda de actualizaciones.
 
 ## Desarrollo
 

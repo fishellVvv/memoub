@@ -29,8 +29,9 @@ Estado actual de esta linea:
 - ventana principal con comportamiento nativo ya operativa
 - preview de la nota sobre el tray ya implementada
 - instalador Windows real ya validado fuera de `tauri:dev`
-- release publica Windows ya disponible en GitHub Releases
+- releases publicas Android y Windows ya disponibles en GitHub Releases
 - login Windows ya validado tambien en instalacion limpia
+- comprobacion manual de actualizaciones disponible desde el menu
 
 ## Comportamiento del icono
 
@@ -111,4 +112,5 @@ La base tecnica fijada para esta fase es:
 
 - Primero: usar Tauri como base nativa de Windows
 - Despues: seguir puliendo la shell ya implementada y mantener el flujo real de distribucion Windows
+- La distribucion actual sigue siendo manual por GitHub Releases, sin auto-updater silencioso
 - Si se quiere cumplir esta UX completa, la via fijada es empaquetado nativo

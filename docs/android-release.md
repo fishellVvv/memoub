@@ -9,6 +9,7 @@ Generar una **APK release firmada** de `memoub` para distribuirla manualmente fu
 - El proyecto Android ya vive en [`android/`](../android)
 - La app ya se ha instalado y validado en dispositivo real
 - El login nativo de Google ya funciona tambien en build `release`
+- La release publica actual usa tag `android-v1.1.0`
 
 ## Archivos locales sensibles
 
@@ -111,6 +112,7 @@ Para que Android actualice correctamente una APK instalada manualmente:
 - Si hay una actualizacion, abre la release o el APK correspondiente.
 - La app no instala APKs directamente.
 - La app no solicita permisos extra para instalar APK.
+- Los usuarios en `1.0.x` deben actualizar manualmente desde GitHub Releases, porque esas versiones no tenian comprobador de actualizaciones.
 
 ## Carpeta local para subir releases
 

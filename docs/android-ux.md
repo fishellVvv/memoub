@@ -17,6 +17,7 @@ La version de Windows ya existe como companion de escritorio, pero sigue esta lo
 
 - App instalada en Android con **icono propio** en pantalla inicial
 - Apertura **a pantalla completa**
+- Canal actual: APK firmada en GitHub Releases
 - Ideal futuro: publicacion en **Play Store**
 - Mientras tanto, la UX se diseña como si ya fuera una app movil real
 
@@ -50,6 +51,7 @@ Opciones aprobadas por ahora:
 
 - `Cambiar tema`
 - `Cambiar idioma`
+- `Buscar actualizaciones`
 - `Forzar sincronizacion`
 - `Cerrar sesion`
 

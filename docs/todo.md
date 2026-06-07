@@ -24,7 +24,7 @@
 - Instalador Windows `.exe` validado fuera de `tauri:dev`
 - Persistencia de sesion y preview del tray validadas en la app Windows instalada
 - Flujo manual de release Windows documentado
-- Release publica Windows subida a GitHub
+- Releases publicas Android y Windows subidas a GitHub
 - Produccion desplegada en Vercel
 - Login y sincronizacion validados en produccion
 - Resincronizacion offline simple validada
@@ -40,7 +40,7 @@
 - Base visual y de UX considerada suficientemente pulida para esta fase
 - Icono final de `memoub` definido y aplicado en Android, Windows y web
 - Login Windows validado tambien en instalacion limpia de la app instalada
-- Releases publicas Android `1.0.1` y Windows `1.0.3` ya publicadas
+- Releases publicas Android `1.1.0` y Windows `1.1.0` ya publicadas
 - README actualizado ya con enlaces a las releases publicas vigentes
 - Escrituras locales serializadas para evitar carreras entre ediciones rapidas
 - `updated_at` movido a fuente de verdad de Supabase mediante trigger
@@ -50,16 +50,15 @@
 - Checklist manual profesional de release y verificacion añadido
 - UI principal parcialmente extraida en componentes para pantallas, menu, idioma, conflicto y footer
 - Comprobador manual de actualizaciones preparado para Android y Windows mediante GitHub Releases
+- Comprobador de actualizaciones validado en builds instaladas de Android y Windows
 
 ## Siguiente linea de desarrollo
 
 - Definir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Decidir si Windows seguira con distribucion manual por GitHub Releases o tendra una via mas automatizada
-- Validar manualmente el comprobador de actualizaciones en builds instaladas de Android y Windows
 
 ## Pendiente funcional
 
-- Decidir si Android seguira con distribucion manual por APK o pasara a Play Store
 - Valorar si conviene anadir import/export o presets compartibles para `Custom`
 - Revisar si hace falta mantener algun modo de desarrollo offline mas guiado
 

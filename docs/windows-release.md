@@ -53,7 +53,7 @@ src-tauri/target/release/bundle/nsis/memoub_X.Y.Z_x64-setup.exe
 Ejemplo local preparado:
 
 ```text
-src-tauri/target/release/bundle/nsis/memoub_1.0.3_x64-setup.exe
+src-tauri/target/release/bundle/nsis/memoub_1.1.0_x64-setup.exe
 ```
 
 ## Validacion minima antes de subir
@@ -109,6 +109,12 @@ Flujo recomendado:
 windows-vX.Y.Z
 ```
 
+Ejemplo actual publicado:
+
+```text
+windows-v1.1.0
+```
+
 2. Titulo de la release:
 
 ```text
@@ -128,6 +134,7 @@ memoub_X.Y.Z_x64-setup.exe
 - Si hay una actualizacion, abre el instalador o la release correspondiente.
 - No se usa Tauri updater en `1.1.0`.
 - El updater es manual: comprobar, abrir descarga o release, instalar por el usuario.
+- Los usuarios en `1.0.x` deben actualizar manualmente desde GitHub Releases, porque esas versiones no tenian comprobador de actualizaciones.
 
 ## Checklist mental para futuras versiones
 

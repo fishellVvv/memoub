@@ -6,8 +6,8 @@
 - **PWA**: `vite-plugin-pwa`
 - **Android nativo**: Capacitor + Android Studio
 - **Windows nativo**: Tauri
-- **Distribucion Android actual**: APK release firmada para reparto manual
-- **Distribucion Windows actual**: instalador `.exe` release firmado por Tauri y repartido manualmente
+- **Distribucion Android actual**: APK release firmada en GitHub Releases
+- **Distribucion Windows actual**: instalador `.exe` de Tauri en GitHub Releases
 - **Backend**: Supabase
 - **Auth web**: Google OAuth con Supabase Auth
 - **Auth Android**: Google Sign-In nativo + `signInWithIdToken` de Supabase
@@ -29,6 +29,7 @@
 - Soporte offline basico con copia local y reintento al volver la conexion
 - Preferencias visuales e idioma guardados localmente por dispositivo
 - Tipografia local por bundle, sin depender de fuentes propietarias del sistema
+- Comprobacion manual de actualizaciones desde GitHub Releases en Android y Windows
 
 ## Estado implementado
 
@@ -48,7 +49,7 @@
 - El instalador Windows real ya se ha generado y validado fuera de `tauri:dev`
 - La sesion desktop y la preview del tray ya funcionan tambien en la app instalada
 - El login Windows ya se ha validado tambien en instalacion limpia, sin depender de una sesion previa de `tauri:dev`
-- La release publica de Windows ya vive en GitHub Releases
+- Las releases publicas Android y Windows `1.1.0` ya viven en GitHub Releases
 - El despliegue en Vercel y el acceso en produccion ya se han validado
 - El sistema de temas ya incluye presets, modo sistema y editor `Custom`
 - El idioma ya puede seguir al sistema o fijarse manualmente en `es` o `en`

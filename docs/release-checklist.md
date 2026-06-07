@@ -8,6 +8,7 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Ejecutar `npm run build`.
 - Confirmar que `.env`, `android/keystore.properties`, `android/*.jks` y `android/*.keystore` no aparecen en `git status`.
 - Confirmar que `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` y `android/app/build.gradle` tienen las versiones esperadas para la release.
+- Confirmar que los enlaces publicos del README apuntan a los assets vigentes.
 - Ejecutar `npm audit` solo si se aprueba explicitamente enviar metadatos de dependencias al servicio externo de npm.
 
 ## Web
@@ -30,7 +31,7 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Entrar con Google usando el flujo nativo.
 - Escribir offline, volver online y confirmar resincronizacion.
 - Confirmar que una APK nueva actualiza correctamente una version previa firmada con el mismo keystore y `versionCode` superior.
-- Confirmar que existe una release con tag `android-v1.1.0` para validar el comprobador.
+- Confirmar que existe una release con tag `android-vX.Y.Z` para validar el comprobador. Ejemplo: `android-v1.1.0`.
 - Abrir el menu y pulsar `Buscar actualizaciones`.
 - Confirmar que no se abre nada automaticamente.
 - Confirmar estado `actualizado` cuando no hay version superior.
@@ -49,7 +50,7 @@ Este checklist complementa la CI. La CI confirma que el proyecto compila y que l
 - Reabrir desde tray.
 - Pasar el raton sobre el tray y confirmar que la preview refleja nota, tema y estado.
 - Desactivar `Iniciar con Windows`, cerrar con `Quit memoub`, abrir de nuevo y confirmar que la opcion sigue desactivada.
-- Confirmar que existe una release con tag `windows-v1.1.0` para validar el comprobador.
+- Confirmar que existe una release con tag `windows-vX.Y.Z` para validar el comprobador. Ejemplo: `windows-v1.1.0`.
 - Abrir el menu y pulsar `Check for updates`.
 - Confirmar que no se abre nada automaticamente.
 - Confirmar estado `up to date` cuando no hay version superior.
